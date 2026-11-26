@@ -21,7 +21,7 @@ pragma solidity 0.8.28;
 ///        proportionally to score (stake x slot multiplier).
 ///      - Rounds run on a fixed 5-minute time grid starting at deployment.
 ///        Round 0 opens at the deployment timestamp; round N opens at
-///        genesis + N * 300 seconds. No keeper is needed to start rounds.
+///        genesis + N * 60 seconds. No keeper is needed to start rounds.
 /// @dev Assumptions an auditor should check:
 ///      - The stake token (AGC) is a standard ERC20 that returns bool from
 ///        transfer/transferFrom and does not tax transfers to or from this
@@ -97,7 +97,7 @@ contract PlinkoRoyale {
     // ------------------------------------------------------------------
 
     /// @notice Length of one round's entry window, in seconds (5 minutes).
-    uint256 public constant ROUND_DURATION = 300;
+    uint256 public constant ROUND_DURATION = 60;
 
     /// @notice How long after a round closes anyone may still draw before
     ///         the round becomes refundable (1 hour, mirrors Battle Royale).

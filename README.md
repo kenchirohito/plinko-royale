@@ -4,7 +4,7 @@ A PvP Plinko game for the AGC (Agentic Coin) ecosystem on BSC.
 
 Players stake fixed tiers (100K / 300K / 500K / 1M / 2M / 5M / 10M AGC,
 mirroring Battle Royale) into a shared pot each
-5-minute round. One Chainlink VRF random word per round decides every
+1-minute round. One Chainlink VRF random word per round decides every
 player's Plinko slot (8 peg rows, 9 slots, multipliers 0.4x–11.6x with
 expected value exactly 1.0), and the pot is split proportionally to
 score (stake × multiplier). There is no house and no bankroll: players
@@ -28,7 +28,7 @@ migration are still outstanding before any mainnet launch.
 
 | | |
 |---|---|
-| Game contract (testnet, chain 97) | `0x4f65C6db7ECA6E81B7fb139D0d539b5ae2E1d614` |
+| Game contract (testnet, chain 97) | `0x5133d3a7b0AAb6dFb3c40b824741FA4A776Bc3EF` |
 | Stake token (testnet) | MockAGC `0x17356908F432eD7F2a4b378F19b5c869b872e21E` (open faucet mint) |
 | VRF wrapper | Chainlink VRF v2.5 `0x471506e6ADED0b9811D05B8cAc8Db25eE839Ac94` |
 | Frontend (testnet demo) | https://plinko-royale-testnet-kenchiro.vercel.app |

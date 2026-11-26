@@ -1,7 +1,7 @@
 # Plinko Royale — Agent Guide (llms-plinko.txt)
 
 Plinko Royale is a PvP Plinko game for the AGC (Agentic Coin) ecosystem.
-Players stake fixed tiers into a shared pot each 5-minute round; one
+Players stake fixed tiers into a shared pot each 1-minute round; one
 Chainlink VRF random word decides every player's Plinko slot; the pot is
 split by score (stake x slot multiplier). 0.3% of every pot is burned,
 0.3% goes to a fixed operational-fee address, 99.4% is paid to players.
@@ -17,7 +17,7 @@ ADDRESSES  (TESTNET — these change at mainnet launch; see "Mainnet" below)
 =====================================================================
 
 Chain:            BSC Testnet, chain ID 97
-Game contract:    0x4f65C6db7ECA6E81B7fb139D0d539b5ae2E1d614
+Game contract:    0x5133d3a7b0AAb6dFb3c40b824741FA4A776Bc3EF
 Stake token:      0x17356908F432eD7F2a4b378F19b5c869b872e21E  (MockAGC, test only)
 VRF wrapper:      0x471506e6ADED0b9811D05B8cAc8Db25eE839Ac94  (Chainlink VRF v2.5)
 Burn address:     0x000000000000000000000000000000000000dEaD
@@ -29,8 +29,8 @@ GAME RULES (exact)
 =====================================================================
 
 - Rounds run on a fixed clock: round 0 opened at deployment, a new round
-  opens every 300 seconds. Nobody starts rounds; the current round id is
-  (block.timestamp - genesis) / 300.
+  opens every 60 seconds. Nobody starts rounds; the current round id is
+  (block.timestamp - genesis) / 60.
 - Stake tiers (exact amounts only, 18 decimals; mirror Battle Royale):
       100,000 AGC  = 100000000000000000000000 wei
       300,000 AGC  = 300000000000000000000000 wei
@@ -78,7 +78,7 @@ CONTRACT INTERFACE (PlinkoRoyale)
 =====================================================================
 
 Constants (pure views):
-  ROUND_DURATION() -> 300
+  ROUND_DURATION() -> 60
   MAX_PLAYERS() -> 500            (entries per round cap)
   DRAW_TIMEOUT() -> 3600          RANDOM_TIMEOUT() -> 3600
   TIER_1() .. TIER_7()             -> stake tiers in wei (100K..10M)

@@ -6,7 +6,7 @@ steps for a BSC testnet deployment. The game rules themselves are in
 `../DESIGN.md`; this file is about the contract.
 
 **Status: written, tested, and deployed to BSC testnet** (chain 97) at
-`0x4f65C6db7ECA6E81B7fb139D0d539b5ae2E1d614` (2026-11-26, external-audit
+`0x5133d3a7b0AAb6dFb3c40b824741FA4A776Bc3EF` (2026-11-26, external-audit
 fixes; see `../testnet/TESTNET-REPORT.md`). 52 Foundry tests pass,
 including exact payout checks against `verify.py`'s worked examples and
 a 2,000-run fuzz test.
@@ -18,7 +18,7 @@ a 2,000-run fuzz test.
 One Solidity file (solc 0.8.28, no imports, ~9.6 KB deployed) that runs the
 whole game on-chain:
 
-- Players stake AGC into 5-minute rounds.
+- Players stake AGC into 1-minute rounds.
 - After a round closes, one Chainlink VRF random word decides every player's
   Plinko slot.
 - The pot is split by score: **0.3% burned, 0.3% to a fixed fee address,
@@ -33,7 +33,7 @@ constructor. If a bug is ever found, the fix is a new deployment, not a patch.
 ## 2. How a round works, step by step
 
 Rounds run on a fixed clock: round 0 opens the moment the contract is
-deployed, and a new round opens every 300 seconds after that. Nobody has to
+deployed, and a new round opens every 60 seconds after that. Nobody has to
 "start" a round.
 
 1. **Enter** — `enter(roundId, amount, clientSeed)`. Amount must be exactly
@@ -183,7 +183,7 @@ in the code.
   `withdraw` would revert until unpaused (refunds only credit balances, so
   they keep working). Verify AGC's behavior once more before mainnet.
 - **Timestamps.** Round boundaries use `block.timestamp`; BSC validator
-  drift is seconds, immaterial against 5-minute rounds and 1-hour timeouts.
+  drift is seconds, immaterial against 1-minute rounds and 1-hour timeouts.
 - **One entry per address** does not stop one person using many addresses
   (same as Battle Royale). Fixed tiers bound how much that can matter.
 

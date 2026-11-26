@@ -3,12 +3,13 @@
 **Status: COMPLETE.** Updated 2026-11-26. Full details in
 [TESTNET-REPORT.md](TESTNET-REPORT.md).
 
-> **Redeployed 2026-11-26** (latest) with the 7-tier stake ladder
-> mirroring Battle Royale (100K/300K/500K/1M/2M/5M/10M AGC; includes
-> the earlier external-audit fixes, 500-player cap, `playersOf`, and
-> the 0.3%+0.3% fee model): current contract is
-> `0x4f65C6db7ECA6E81B7fb139D0d539b5ae2E1d614` (Sourcify exact_match,
-> matchId 59988487).
+> **Redeployed 2026-11-26** (latest) with 1-minute rounds
+> (`ROUND_DURATION` 300 → 60; includes the 7-tier stake ladder
+> mirroring Battle Royale, the earlier external-audit fixes,
+> 500-player cap, `playersOf`, and the 0.3%+0.3% fee model):
+> current contract is
+> `0x5133d3a7b0AAb6dFb3c40b824741FA4A776Bc3EF` (Sourcify exact_match,
+> matchId 59996220).
 > The steps below describe the first deployment; see the "Redeployment"
 > section in TESTNET-REPORT.md for the current one.
 

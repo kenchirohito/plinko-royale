@@ -293,3 +293,47 @@ deployment `0x8643ab8Fe68aBC315aC7D38b5518e6cc3644F0a7` is superseded.
 Frontend (ABI `uint256[7]`, new address, deploy block), keeper,
 llms-plinko.txt, agent-round.sh, stress-test.py, and all docs point
 at the new address and tier ladder.
+
+### Verification round on the 7-tier contract (2026-11-26, reported ~17:04 WIB)
+
+Played with 5 bots entering at mixed tiers (100K, 300K, 1M, 2M, 10M)
+on `0x4f65…d614`. All checks passed:
+
+- Pot 13,400,000 test AGC; burn **40,200** → dead address and
+  operational fee **40,200** → fee recipient (exactly 0.3% / 0.3%).
+- Every player's payout matched local recomputation; the small tiers
+  (100K/300K) entered and settled correctly.
+- Frontend live points at the new contract; the update was pushed to
+  GitHub (github.com/kenchirohito/plinko-royale).
+
+Round duration stays 5 minutes (Battle Royale's 3-minute rounds were
+not adopted — owner's call pending).
+
+---
+
+## 1-minute rounds redeployment — 2026-11-26
+
+At the owner's order, rounds now run every **1 minute**
+(`ROUND_DURATION` 300 → 60; Battle Royale moved to 3 minutes, the
+owner chose 1). Settlement math, fees (0.3% + 0.3%), tiers (7), and
+the 1-hour draw/random timeouts are unchanged. Keeper scan window
+widened to 70 rounds so the 1-hour timeout refunds stay reachable at
+60 rounds/hour. Suite still **52/52** (one assertion updated to
+`closesAt == genesis + 60`).
+
+**Redeployed 2026-11-26:** new contract
+[`0x5133d3a7b0AAb6dFb3c40b824741FA4A776Bc3EF`](https://testnet.bscscan.com/address/0x5133d3a7b0AAb6dFb3c40b824741FA4A776Bc3EF)
+(deploy tx `0xab117d3931966bb2e6f7591dc19eb54605518fd19b539f77a5deccc854dd4d79`,
+block 144976141, same constructor args; Sourcify submitted,
+job `fb96a824-6a08-4e7a-9db6-c25cbabe7b54`; on-chain
+`ROUND_DURATION()` = 60, round 0 opens/closes exactly 60s apart).
+The previous deployment `0x4f65C6db7ECA6E81B7fb139D0d539b5ae2E1d614`
+is superseded. Frontend (new address, deploy block, 1-minute text),
+keeper (new address, 70-round scan), llms-plinko.txt, agent-round.sh,
+stress-test.py, and all docs point at the new contract.
+Verification round #1 on the 1-minute contract PASSED the same
+evening: 5 bots entered within a single 60-second window (tiers
+100K/500K/1M/5M/10M, pot 16,600,000 test AGC), keeper drew and
+settled, burn and operational fee exactly 49,800 each, conservation
+exact, every slot/payout matched local recomputation from the VRF
+word.

@@ -54,7 +54,7 @@ time; the center pays 0.4× and hits 27.3% of the time.
 
 ## 2. Round flow
 
-1. **Open** (5 minutes, mirroring Battle Royale): each player stakes one fixed
+1. **Open** (1 minute): each player stakes one fixed
    tier — **100,000 / 300,000 / 500,000 / 1,000,000 / 2,000,000 / 5,000,000 /
    10,000,000 AGC** (the same ladder as Battle Royale) — and is entered for one
    ball drop. One entry per address per round (keeps it simple; no raising).
@@ -222,7 +222,7 @@ Rounds move through the same phases as Battle Royale:
 
 | Phase | Meaning | Exit |
 |---|---|---|
-| `Open` | Entries accepted (5 minutes). | Round time ends → `AwaitingDraw` (or refund if < 2 players). |
+| `Open` | Entries accepted (1 minute). | Round time ends → `AwaitingDraw` (or refund if < 2 players). |
 | `AwaitingDraw` | Closed, ≥ 2 players, waiting for `draw(roundId)`. | Anyone calls `draw` (keeper normally does, seconds after close, paying the VRF fee in BNB) → `AwaitingRandom`. If nobody draws within **1 hour** of close → `Refunded`. |
 | `AwaitingRandom` | VRF request sent (`requestId` stored on the round). | VRF callback delivers the word → settle → `Settled`. If the word never arrives within **1 hour** of the request → `Refunded`. |
 | `Settled` | Slots derived, payouts credited, burn + fee taken. | Final. |
@@ -291,7 +291,7 @@ are identical for agents and humans.
 
 > **Update (2026-11-26):** the production contract lives at
 > `contracts/PlinkoRoyale.sol` and is deployed on BSC testnet
-> (`0x4f65C6db7ECA6E81B7fb139D0d539b5ae2E1d614`, redeployed 2026-11-26
+> (`0x5133d3a7b0AAb6dFb3c40b824741FA4A776Bc3EF`, redeployed 2026-11-26
 > with the 0.6% fee model below; the earlier `0x20Aa35C4…` deployment
 > ran 1%). It follows this sketch
 > with two additions from the internal audit: a `MAX_PLAYERS = 500`

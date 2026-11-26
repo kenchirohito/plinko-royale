@@ -18,7 +18,7 @@ bawah disalin persis dari `testnet/TESTNET-REPORT.md` dan `llms-plinko.txt`.
 | Apa | Link / alamat |
 | --- | --- |
 | Demo testnet (browser) | https://plinko-royale-testnet-kenchiro.vercel.app |
-| Kontrak game (testnet, **current**) | `0x4f65C6db7ECA6E81B7fb139D0d539b5ae2E1d614` — https://testnet.bscscan.com/address/0x4f65C6db7ECA6E81B7fb139D0d539b5ae2E1d614 |
+| Kontrak game (testnet, **current**) | `0x5133d3a7b0AAb6dFb3c40b824741FA4A776Bc3EF` — https://testnet.bscscan.com/address/0x5133d3a7b0AAb6dFb3c40b824741FA4A776Bc3EF |
 | Kontrak lama (**superseded, jangan dipakai**) | `0x9F485aF31008f9678F43b4f9f81cD11C7216f79c`, `0x20Aa35C4441F05f5435c812308A6620536B54fa2`, `0x66d8e0d61f3b89d1962bfef0cd19be767a2a3d49`, `0x8643ab8Fe68aBC315aC7D38b5518e6cc3644F0a7` |
 | Token test (MockAGC) | `0x17356908F432eD7F2a4b378F19b5c869b872e21E` |
 | Proposal ID (5 halaman) | `~/workspace/your_files/plinko-royale-proposal/plinko-royale-proposal.pdf` |
@@ -34,13 +34,14 @@ Catatan demo live: fee **sudah diputuskan dan diterapkan** 26 Nov 2026
 juga **sudah disamakan persis Battle Royale** atas perintah owner 26 Nov
 2026 ~16:28 WIB: **100K/300K/500K/1M/2M/5M/10M AGC** (sebelumnya
 2jt/5jt/10jt). Kontrak current
-`0x4f65C6db7ECA6E81B7fb139D0d539b5ae2E1d614` (BURN_BPS/FEE_BPS = 30,
+`0x5133d3a7b0AAb6dFb3c40b824741FA4A776Bc3EF` (BURN_BPS/FEE_BPS = 30,
 cap 500 pemain, 52/52 tes, Sourcify exact_match). Ronde verifikasi
 ~13:42 WIB (5 bot, pot 24jt, burn/fee 72.000 masing-masing, keeper
 draw+settle sendiri) itu di kontrak **sebelumnya** `0x8643…F0a7`,
 bukan di kontrak current — ronde verifikasi untuk `0x4f65…` (5 bot,
-tier campuran 100K/300K/1jt/2jt/10jt) lagi jalan 26 Nov ~16:34 WIB
-dan hasilnya belum dicatat di `testnet/TESTNET-REPORT.md`. Frontend
+tier campuran 100K/300K/1jt/2jt/10jt, pot 13,4jt, burn/fee 40.200
+masing-masing) lolos dan dilaporkan 26 Nov ~17:04 WIB; hasilnya
+tercatat di `testnet/TESTNET-REPORT.md` §7-tier. Frontend
 live + `frontend/index.html` + `keeper.py` sudah menunjuk alamat ini.
 **Teks §3–§4, FAQ §6, dan proposal PDF masih memakai angka lama
 0,5% + 0,5%, tier lama 2/5/10jt, dan alamat lama — JANGAN disebar**

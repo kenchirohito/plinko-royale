@@ -29,7 +29,7 @@ from math import comb
 
 ROWS = 8                      # peg rows -> ROWS+1 = 9 landing slots
 SLOTS = ROWS + 1
-STAKE_TIERS = (2_000_000, 5_000_000, 10_000_000)   # AGC, mirrors Battle Royale
+STAKE_TIERS = (100_000, 300_000, 500_000, 1_000_000, 2_000_000, 5_000_000, 10_000_000)   # AGC, mirrors Battle Royale's 7-tier ladder
 BURN_BPS = 30                                       # 0.3% of pot burned
 FEE_BPS = 30                                        # 0.3% of pot operational fee
 BPS_DEN = 10_000                                    # basis-point denominator
@@ -156,7 +156,7 @@ def main():
         ([2_000_000, 2_000_000], [0, 8]),           # both edges
         ([2_000_000, 5_000_000, 10_000_000], [4, 4, 4]),  # all same slot (tie)
         ([10_000_000] * 50, [4] * 50),              # max players, all center
-        ([2_000_000, 10_000_000], [8, 0]),          # min vs max tier, both edges
+        ([100_000, 10_000_000], [8, 0]),          # min vs max tier, both edges
     ]
     for stakes, slots in edge_cases:
         payouts, burn, fee, dust = settle_round(stakes, slots)

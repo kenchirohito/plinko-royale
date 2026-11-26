@@ -149,7 +149,7 @@ contract PlinkoRoyaleTest is Test {
         (uint256 roundId, uint64 opensAt, uint64 closesAt) = game.currentRound();
         assertEq(roundId, 0);
         assertEq(opensAt, T0);
-        assertEq(closesAt, T0 + 300);
+        assertEq(closesAt, T0 + 60);
         assertEq(game.stakedOf(alice), TIER1);
         assertEq(game.stakedOf(bob), TIER2);
 

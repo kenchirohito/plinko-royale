@@ -56,7 +56,7 @@ import time
 from pathlib import Path
 
 # --- constants (testnet; see llms-plinko.txt) -------------------------------
-GAME = "0x4f65C6db7ECA6E81B7fb139D0d539b5ae2E1d614"
+GAME = "0x5133d3a7b0AAb6dFb3c40b824741FA4A776Bc3EF"
 RPCS = [
     "https://data-seed-prebsc-1-s1.bnbchain.org:8545",
     "https://bsc-testnet-rpc.publicnode.com",
@@ -64,7 +64,7 @@ RPCS = [
 EXPECTED_CHAIN_ID = 97
 CAST = str(Path.home() / ".foundry" / "bin" / "cast")
 GAS_PRICE_FLOOR_WEI = 100_000_000  # 0.1 gwei floor; actual price fetched per pass
-SCAN_BACK_ROUNDS = 20  # > 1h of rounds (12), so timeout refunds are reachable
+SCAN_BACK_ROUNDS = 70  # > 1h of rounds (60 at 1 min/round), so timeout refunds are reachable
 STATE_FILE = Path(__file__).with_name("keeper-state.json")
 DEFAULT_KEY_FILE = Path(__file__).with_name("testnet") / "keys" / "deployer.txt"
 
