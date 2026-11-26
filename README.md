@@ -2,7 +2,8 @@
 
 A PvP Plinko game for the AGC (Agentic Coin) ecosystem on BSC.
 
-Players stake fixed tiers (2M / 5M / 10M AGC) into a shared pot each
+Players stake fixed tiers (100K / 300K / 500K / 1M / 2M / 5M / 10M AGC,
+mirroring Battle Royale) into a shared pot each
 5-minute round. One Chainlink VRF random word per round decides every
 player's Plinko slot (8 peg rows, 9 slots, multipliers 0.4x–11.6x with
 expected value exactly 1.0), and the pot is split proportionally to
@@ -27,7 +28,7 @@ migration are still outstanding before any mainnet launch.
 
 | | |
 |---|---|
-| Game contract (testnet, chain 97) | `0x8643ab8Fe68aBC315aC7D38b5518e6cc3644F0a7` |
+| Game contract (testnet, chain 97) | `0x4f65C6db7ECA6E81B7fb139D0d539b5ae2E1d614` |
 | Stake token (testnet) | MockAGC `0x17356908F432eD7F2a4b378F19b5c869b872e21E` (open faucet mint) |
 | VRF wrapper | Chainlink VRF v2.5 `0x471506e6ADED0b9811D05B8cAc8Db25eE839Ac94` |
 | Frontend (testnet demo) | https://plinko-royale-testnet-kenchiro.vercel.app |
@@ -36,7 +37,7 @@ migration are still outstanding before any mainnet launch.
 
 - [`DESIGN.md`](DESIGN.md) — game design, economics, fairness model
 - [`contracts/`](contracts/) — `PlinkoRoyale.sol` (single file, zero
-  imports, solc 0.8.28) + Foundry tests (51 passing, incl. a
+  imports, solc 0.8.28) + Foundry tests (52 passing, incl. a
   2,000-run conservation fuzz). Run `forge install` then `forge test`
   (forge-std is a submodule, not vendored).
 - [`frontend/`](frontend/) — single-file testnet frontend (ethers v6)

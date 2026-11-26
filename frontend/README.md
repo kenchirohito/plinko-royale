@@ -5,7 +5,7 @@ BSC testnet deployment. No build step, no keys, testnet only.
 
 - **Live:** https://plinko-royale-testnet-kenchiro.vercel.app
 - **Vercel project:** `plinko-royale-testnet` (team kenchiro, `prj_FEZTKmeZff7DHmvWtXUIuZQUrmyw`)
-- **Contracts (chain 97):** PlinkoRoyale `0x8643ab8Fe68aBC315aC7D38b5518e6cc3644F0a7`
+- **Contracts (chain 97):** PlinkoRoyale `0x4f65C6db7ECA6E81B7fb139D0d539b5ae2E1d614`
   (redeployed 2026-11-26 with the 500-player cap + `playersOf` view;
   Sourcify exact_match),
   MockAGC `0x17356908F432eD7F2a4b378F19b5c869b872e21E`

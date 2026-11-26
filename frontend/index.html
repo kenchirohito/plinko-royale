@@ -183,7 +183,7 @@
 
       <div class="card how">
         <h2 style="color:var(--text)">Cara main</h2>
-        <p>Ronde berjalan tiap <b>5 menit</b>. Pilih taruhan tetap (<b>2jt / 5jt / 10jt AGC</b>),
+        <p>Ronde berjalan tiap <b>5 menit</b>. Pilih taruhan tetap (<b>100rb / 300rb / 500rb / 1jt / 2jt / 5jt / 10jt AGC</b>),
         satu entri per alamat per ronde. Setelah ronde tutup, siapa pun bisa menekan <b>Draw</b> —
         Chainlink VRF mengeluarkan satu angka acak yang menentukan slot semua pemain
         (bola jatuh lewat 8 baris pasak ke 9 slot; pengali tepi 11,6×, tengah 0,4×).</p>
@@ -222,10 +222,10 @@ const RPC_URLS = [
 ];
 const RPC_URL = RPC_URLS[0]; // untuk wallet add-chain; baca data pakai rotasi di bawah
 const EXPLORER = "https://testnet.bscscan.com";
-const GAME_ADDR  = "0x8643ab8Fe68aBC315aC7D38b5518e6cc3644F0a7"; // PlinkoRoyale (redeploy 2026-11-26, audit eksternal LOW-1 + view baru)
+const GAME_ADDR  = "0x4f65C6db7ECA6E81B7fb139D0d539b5ae2E1d614"; // PlinkoRoyale (redeploy 2026-11-26, 7 tier stake ala Battle Royale)
 const TOKEN_ADDR = "0x17356908F432eD7F2a4b378F19b5c869b872e21E"; // MockAGC (testnet)
 const MULTICALL3 = "0xcA11bde05977b3631167028862bE2a173976CA11"; // batch eth_call (audit MEDIUM-1)
-const DEPLOY_BLOCK = 144931878;                        // blok deploy PlinkoRoyale (referensi saja; daftar pemain kini via playersOf)
+const DEPLOY_BLOCK = 144955838;                        // blok deploy PlinkoRoyale (referensi saja; daftar pemain kini via playersOf)
 const MINT_AMOUNT = ethers.parseUnits("100000000", 18); // 100jt AGC test per klik
 
 const GAME_ABI = [
@@ -246,7 +246,7 @@ const GAME_ABI = [
   "function drawRequestedAtOf(uint256 roundId) view returns (uint256)",
   "function playersOf(uint256 roundId) view returns (address[])",
   "function MAX_PLAYERS() view returns (uint256)",
-  "function stakeTiers() view returns (uint256[3])",
+  "function stakeTiers() view returns (uint256[7])",
   "function multipliersX100() view returns (uint16[9])",
   "event Entered(uint256 indexed roundId, address indexed player, uint256 amount, bytes32 clientSeed)",
   "event DrawRequested(uint256 indexed roundId, uint256 requestId)",
@@ -290,7 +290,7 @@ function rotateRpc() {
 
 let signer = null, account = null;         // wallet terhubung (null = mode baca)
 let game = null, token = null;             // kontrak dengan signer
-let tiers = [];                            // [2jt, 5jt, 10jt] dalam wei (BigInt)
+let tiers = [];                            // 7 tier (100rb..10jt) dalam wei (BigInt), dibaca dari kontrak
 let maxPlayers = 500;                      // batas pemain per ronde (dibaca dari kontrak saat init)
 let multX100 = [1160,300,140,70,40,70,140,300,1160];
 let selectedTier = 0;
@@ -334,7 +334,7 @@ const REVERT_ID = {
   "round full": "Ronde sudah penuh (maks 500 pemain) — ikut ronde berikutnya ya, 5 menit lagi.",
   "already entered": "Kamu sudah ikut ronde ini (satu entri per alamat).",
   "round not open": "Ronde ini tidak sedang dibuka untuk pendaftaran.",
-  "amount not a stake tier": "Jumlah taruhan harus salah satu tier (2jt/5jt/10jt).",
+  "amount not a stake tier": "Jumlah taruhan harus salah satu tier (100rb/300rb/500rb/1jt/2jt/5jt/10jt).",
   "stake transfer failed": "Transfer taruhan gagal — cek saldo & allowance.",
   "stake transfer taxed": "Token memotong transfer (tax) — entri ditolak kontrak.",
   "round not awaiting draw": "Ronde ini tidak dalam status menunggu draw.",
@@ -919,7 +919,7 @@ $("tokenLink").href = `${EXPLORER}/address/${TOKEN_ADDR}`;
     multX100 = [...m].map(Number);
     maxPlayers = Number(mp);
   } catch (e) {
-    tiers = [ethers.parseUnits("2000000", 18), ethers.parseUnits("5000000", 18), ethers.parseUnits("10000000", 18)];
+    tiers = ["100000", "300000", "500000", "1000000", "2000000", "5000000", "10000000"].map(v => ethers.parseUnits(v, 18));
   }
   renderTiers();
   drawBoard(null);

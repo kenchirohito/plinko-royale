@@ -98,7 +98,7 @@
       <div class="card how">
         <h2 style="color:var(--text)">How it works</h2>
         <p>Each round, you and 5–11 bot players stake a fixed tier
-        (<b>2M / 5M / 10M AGC</b>) and drop one ball through 8 rows of pegs into
+        (<b>100K / 300K / 500K / 1M / 2M / 5M / 10M AGC</b>) and drop one ball through 8 rows of pegs into
         one of 9 slots. Each slot has a <b>multiplier</b> (edges 11.6×, center 0.4×);
         the table is tuned so the expected multiplier is exactly <b>1.0</b>.</p>
         <p>Your <b>score</b> = stake × multiplier. <b>0.3% of the pot is burned</b>
@@ -129,7 +129,7 @@
 // --- Game constants (must match DESIGN.md and verify.py) -------------------
 const ROWS = 8;                                   // peg rows -> 9 slots
 const SLOTS = ROWS + 1;
-const STAKE_TIERS = [2_000_000n, 5_000_000n, 10_000_000n]; // AGC, BigInt
+const STAKE_TIERS = [100_000n, 300_000n, 500_000n, 1_000_000n, 2_000_000n, 5_000_000n, 10_000_000n]; // AGC, BigInt
 const MULT_X100 = [1160, 300, 140, 70, 40, 70, 140, 300, 1160]; // x100
 const BURN_BPS = 30n, FEE_BPS = 30n, BPS_DEN = 10000n; // 0.3% burn + 0.3% operational fee = 0.6% edge
 const MIN_PLAYERS = 2;                            // fewer -> full refund

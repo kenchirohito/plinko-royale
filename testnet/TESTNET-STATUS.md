@@ -3,12 +3,12 @@
 **Status: COMPLETE.** Updated 2026-11-26. Full details in
 [TESTNET-REPORT.md](TESTNET-REPORT.md).
 
-> **Redeployed 2026-11-26** (latest) with the external-audit fixes
-> (LOW-1 phase boundary at closesAt + `wordReceivedOf`/`drawRequestedAtOf`
-> views; includes the earlier 500-player cap, `playersOf`, and the
-> 0.3%+0.3% fee model): current contract is
-> `0x8643ab8Fe68aBC315aC7D38b5518e6cc3644F0a7` (Sourcify submitted,
-> job 4e41fc5d-6eb3-49b5-8285-c79a6aea6c7f).
+> **Redeployed 2026-11-26** (latest) with the 7-tier stake ladder
+> mirroring Battle Royale (100K/300K/500K/1M/2M/5M/10M AGC; includes
+> the earlier external-audit fixes, 500-player cap, `playersOf`, and
+> the 0.3%+0.3% fee model): current contract is
+> `0x4f65C6db7ECA6E81B7fb139D0d539b5ae2E1d614` (Sourcify exact_match,
+> matchId 59988487).
 > The steps below describe the first deployment; see the "Redeployment"
 > section in TESTNET-REPORT.md for the current one.
 

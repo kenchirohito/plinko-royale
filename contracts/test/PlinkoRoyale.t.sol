@@ -253,6 +253,29 @@ contract PlinkoRoyaleTest is Test {
         assertEq(game.randomWordOf(roundId), WORD);
     }
 
+    function testSevenStakeTiers() public {
+        // The ladder mirrors Battle Royale: 100K/300K/500K/1M/2M/5M/10M.
+        uint256[7] memory tiers = game.stakeTiers();
+        assertEq(tiers[0], 100_000e18);
+        assertEq(tiers[1], 300_000e18);
+        assertEq(tiers[2], 500_000e18);
+        assertEq(tiers[3], 1_000_000e18);
+        assertEq(tiers[4], 2_000_000e18);
+        assertEq(tiers[5], 5_000_000e18);
+        assertEq(tiers[6], 10_000_000e18);
+
+        // The smallest tier is enterable.
+        _enter(alice, tiers[0], bytes32(0));
+        (uint256 roundId,,) = game.currentRound();
+        (uint256 stake,,,) = game.entryOf(roundId, alice);
+        assertEq(stake, 100_000e18);
+
+        // A non-tier amount still reverts.
+        vm.prank(bob);
+        vm.expectRevert(bytes("amount not a stake tier"));
+        game.enter(roundId, 200_000e18, bytes32(0));
+    }
+
     // ---------------------------------------------------------------
     // Exact settlement math vs verify.py worked examples (wei-scaled)
     // ---------------------------------------------------------------

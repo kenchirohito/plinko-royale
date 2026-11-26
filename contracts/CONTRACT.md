@@ -6,8 +6,8 @@ steps for a BSC testnet deployment. The game rules themselves are in
 `../DESIGN.md`; this file is about the contract.
 
 **Status: written, tested, and deployed to BSC testnet** (chain 97) at
-`0x8643ab8Fe68aBC315aC7D38b5518e6cc3644F0a7` (2026-11-26, external-audit
-fixes; see `../testnet/TESTNET-REPORT.md`). 51 Foundry tests pass,
+`0x4f65C6db7ECA6E81B7fb139D0d539b5ae2E1d614` (2026-11-26, external-audit
+fixes; see `../testnet/TESTNET-REPORT.md`). 52 Foundry tests pass,
 including exact payout checks against `verify.py`'s worked examples and
 a 2,000-run fuzz test.
 
@@ -37,7 +37,8 @@ deployed, and a new round opens every 300 seconds after that. Nobody has to
 "start" a round.
 
 1. **Enter** — `enter(roundId, amount, clientSeed)`. Amount must be exactly
-   2M, 5M, or 10M AGC. One entry per address per round. The stake is pulled
+   one of the seven tiers: 100K, 300K, 500K, 1M, 2M, 5M, or 10M AGC
+   (mirrors AGC Battle Royale's stake ladder). One entry per address per round. The stake is pulled
    from the player's wallet (they approve the contract first, as usual).
    `clientSeed` is optional extra randomness from the player; it cannot bias
    the outcome because the deciding random word does not exist yet.
@@ -99,7 +100,8 @@ in there, and there is no function that can move tokens anywhere else.
 | `feeRecipient_` | Address receiving the 0.3% fee, forever | **Choose carefully — it can never be changed.** Use a wallet whose key the owner controls. |
 | `wrapper_` | Chainlink VRF v2.5 wrapper (direct funding) | `0x471506e6ADED0b9811D05B8cAc8Db25eE839Ac94` for both BSC mainnet and BSC testnet, per Chainlink's current docs (checked 2026-11-26). **Re-verify at deploy time** on docs.chain.link/vrf/v2-5/supported-networks. |
 
-Everything else is hard-coded: 300-second rounds, tiers 2M/5M/10M AGC,
+Everything else is hard-coded: 300-second rounds, tiers
+100K/300K/500K/1M/2M/5M/10M AGC,
 **max 500 players per round** (`MAX_PLAYERS`, audit M-1 fix),
 0.3% + 0.3% fees (lowered from 0.5% + 0.5% on 2026-11-26, owner-approved,
 to match AGC Battle Royale's ~0.625% expected edge), multipliers, 1-hour timeouts, VRF callback gas limit
@@ -217,7 +219,7 @@ says go.
 
 ```
 cd contracts
-forge test            # 51 tests: lifecycle, worked examples, refunds, fuzz
+forge test            # 52 tests: lifecycle, worked examples, refunds, fuzz
 forge test --fuzz-runs 2000 --match-test testFuzzConservation
 forge build --sizes   # contract size check
 ```

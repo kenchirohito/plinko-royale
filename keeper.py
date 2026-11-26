@@ -56,7 +56,7 @@ import time
 from pathlib import Path
 
 # --- constants (testnet; see llms-plinko.txt) -------------------------------
-GAME = "0x8643ab8Fe68aBC315aC7D38b5518e6cc3644F0a7"
+GAME = "0x4f65C6db7ECA6E81B7fb139D0d539b5ae2E1d614"
 RPCS = [
     "https://data-seed-prebsc-1-s1.bnbchain.org:8545",
     "https://bsc-testnet-rpc.publicnode.com",

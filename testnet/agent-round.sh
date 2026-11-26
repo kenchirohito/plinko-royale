@@ -13,7 +13,7 @@
 set -u
 
 RPC=https://data-seed-prebsc-1-s1.bnbchain.org:8545
-GAME=0x8643ab8Fe68aBC315aC7D38b5518e6cc3644F0a7
+GAME=0x4f65C6db7ECA6E81B7fb139D0d539b5ae2E1d614
 TOKEN=0x17356908F432eD7F2a4b378F19b5c869b872e21E
 DEAD=0x000000000000000000000000000000000000dEaD
 FEERECIP=0x627Ce1AEda3f4B8f2f63E6051Ddd1304fc533c87
@@ -21,8 +21,8 @@ CAST=$HOME/.foundry/bin/cast
 LEGACY="--legacy --gas-price 100000000"
 KEYS=$HOME/workspace/plinko-royale/testnet/keys
 
-TIER1=2000000000000000000000000   # 2,000,000 AGC x 1e18
-TIER2=5000000000000000000000000   # 5,000,000 AGC x 1e18
+STAKE_P1=2000000000000000000000000   # contoh stake P1: 2,000,000 AGC x 1e18 (= TIER_5 kontrak)
+STAKE_P2=5000000000000000000000000   # contoh stake P2: 5,000,000 AGC x 1e18 (= TIER_6 kontrak)
 SEED1=0x00000000000000000000000000000000000000000000000000000000000000a1
 SEED2=0x00000000000000000000000000000000000000000000000000000000000000a2
 
@@ -77,12 +77,12 @@ echo "pre: dead=$DEAD_BEFORE feeRecip=$FEE_BEFORE gameBal1=$GB1_BEFORE gameBal2=
 needs_approve() { python3 -c "import sys; sys.exit(0 if int(sys.argv[1]) < int(sys.argv[2]) else 1)" "$1" "$2"; }
 
 ALLOW1=$(call $TOKEN 'allowance(address,address)(uint256)' $P1 $GAME)
-if needs_approve "$ALLOW1" "$TIER1"; then send "$P1K" "P1 approve" $TOKEN 'approve(address,uint256)' $GAME $TIER1; fi
-send "$P1K" "P1 enter tier1" $GAME 'enter(uint256,uint256,bytes32)' $RID $TIER1 $SEED1
+if needs_approve "$ALLOW1" "$STAKE_P1"; then send "$P1K" "P1 approve" $TOKEN 'approve(address,uint256)' $GAME $STAKE_P1; fi
+send "$P1K" "P1 enter 2jt" $GAME 'enter(uint256,uint256,bytes32)' $RID $STAKE_P1 $SEED1
 
 ALLOW2=$(call $TOKEN 'allowance(address,address)(uint256)' $P2 $GAME)
-if needs_approve "$ALLOW2" "$TIER2"; then send "$P2K" "P2 approve" $TOKEN 'approve(address,uint256)' $GAME $TIER2; fi
-send "$P2K" "P2 enter tier2" $GAME 'enter(uint256,uint256,bytes32)' $RID $TIER2 $SEED2
+if needs_approve "$ALLOW2" "$STAKE_P2"; then send "$P2K" "P2 approve" $TOKEN 'approve(address,uint256)' $GAME $STAKE_P2; fi
+send "$P2K" "P2 enter 5jt" $GAME 'enter(uint256,uint256,bytes32)' $RID $STAKE_P2 $SEED2
 
 # --- 4. discover players via the playersOf view (audit L-6 fix; ----------
 # --- no eth_getLogs needed anymore) ---------------------------------------

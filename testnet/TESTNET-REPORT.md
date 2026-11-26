@@ -270,3 +270,26 @@ round #0). All checks passed:
 (Tx hashes for this round were not recorded in this report; figures are
 from the verification report delivered to the owner 2026-11-26 ~13:42
 WIB.)
+
+---
+
+## 7-tier stake ladder redeployment — 2026-11-26
+
+At the owner's order, the stake tiers now mirror AGC Battle Royale's
+updated ladder: **100K / 300K / 500K / 1M / 2M / 5M / 10M AGC**
+(previously 2M / 5M / 10M). Contract changes: `TIER_1..TIER_7`
+constants, `stakeTiers()` returns `uint256[7]`, `enter()` accepts any
+of the seven. Settlement math, fees (0.3% + 0.3%), and round duration
+(5 minutes) are unchanged. One new test (`testSevenStakeTiers`):
+suite now **52/52**.
+
+**Redeployed 2026-11-26:** new contract
+[`0x4f65C6db7ECA6E81B7fb139D0d539b5ae2E1d614`](https://testnet.bscscan.com/address/0x4f65C6db7ECA6E81B7fb139D0d539b5ae2E1d614)
+(deploy tx `0x6347b589102df1aa81492da34e9471a9d1a4a1ce0681082e3f8556a7a821eeac`,
+block 144955838, same constructor args; Sourcify exact_match,
+matchId 59988487; on-chain `stakeTiers()` = the 7 values,
+`burnBps()`/`feeBps()` = 30, `MAX_PLAYERS()` = 500). The previous
+deployment `0x8643ab8Fe68aBC315aC7D38b5518e6cc3644F0a7` is superseded.
+Frontend (ABI `uint256[7]`, new address, deploy block), keeper,
+llms-plinko.txt, agent-round.sh, stress-test.py, and all docs point
+at the new address and tier ladder.

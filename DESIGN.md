@@ -55,7 +55,8 @@ time; the center pays 0.4× and hits 27.3% of the time.
 ## 2. Round flow
 
 1. **Open** (5 minutes, mirroring Battle Royale): each player stakes one fixed
-   tier — **2,000,000 / 5,000,000 / 10,000,000 AGC** — and is entered for one
+   tier — **100,000 / 300,000 / 500,000 / 1,000,000 / 2,000,000 / 5,000,000 /
+   10,000,000 AGC** (the same ladder as Battle Royale) — and is entered for one
    ball drop. One entry per address per round (keeps it simple; no raising).
    **At most 500 entries per round** (`MAX_PLAYERS`): the 501st entry reverts
    with "round full" and the player simply joins the next round. The cap is a
@@ -272,7 +273,7 @@ withdraw` pattern:
 |---|---|---|
 | Read round | `currentRound() → (roundId, opensAt, closesAt)` | One read tells the agent everything about timing. |
 | Read board | `roundDetail(roundId) → (phase, totalStaked, playerCount, entries…)` | Live pot and entries are public, like Battle Royale's room totals. |
-| Enter | `enter(roundId, amount, clientSeed)` | `amount` must be one of the 3 tiers; `clientSeed` is optional entropy (§5.2, zero if omitted). Stake is pulled from the player's wallet via `transferFrom` (approve the game contract first); in-game balance is NOT used for entries. One entry per address per round. |
+| Enter | `enter(roundId, amount, clientSeed)` | `amount` must be one of the 7 tiers; `clientSeed` is optional entropy (§5.2, zero if omitted). Stake is pulled from the player's wallet via `transferFrom` (approve the game contract first); in-game balance is NOT used for entries. One entry per address per round. |
 | Draw | `draw(roundId)` + VRF fee in BNB | Normally the project keeper; any address may call it. Nobody is paid for drawing. |
 | Read result | `result(roundId, player) → (staked, payout, slot)` | Full audit trail per player. |
 | Withdraw | `withdraw(amount)` | Moves in-game balance to wallet. |
@@ -290,7 +291,7 @@ are identical for agents and humans.
 
 > **Update (2026-11-26):** the production contract lives at
 > `contracts/PlinkoRoyale.sol` and is deployed on BSC testnet
-> (`0x8643ab8Fe68aBC315aC7D38b5518e6cc3644F0a7`, redeployed 2026-11-26
+> (`0x4f65C6db7ECA6E81B7fb139D0d539b5ae2E1d614`, redeployed 2026-11-26
 > with the 0.6% fee model below; the earlier `0x20Aa35C4…` deployment
 > ran 1%). It follows this sketch
 > with two additions from the internal audit: a `MAX_PLAYERS = 500`
@@ -309,7 +310,7 @@ are identical for agents and humans.
 
 interface IPlinkoRoyale {
     // --- constants (immutable, no owner, no admin, no pause — like Battle Royale)
-    function stakeTiers() external pure returns (uint256[3] memory); // 2M, 5M, 10M
+    function stakeTiers() external pure returns (uint256[7] memory); // 100K..10M
     function multipliersX100() external pure returns (uint16[9] memory);
     function burnBps() external pure returns (uint256);              // 50 (0.5%)
     function feeBps() external pure returns (uint256);               // 50 (0.5%)

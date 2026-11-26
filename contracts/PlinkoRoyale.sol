@@ -107,14 +107,27 @@ contract PlinkoRoyale {
     ///         before the round becomes refundable (1 hour).
     uint256 public constant RANDOM_TIMEOUT = 1 hours;
 
-    /// @notice Smallest stake tier: 2,000,000 AGC (AGC has 18 decimals).
-    uint256 public constant TIER_1 = 2_000_000e18;
+    /// @notice Smallest stake tier: 100,000 AGC (AGC has 18 decimals).
+    ///         The seven tiers mirror AGC Battle Royale's stake ladder.
+    uint256 public constant TIER_1 = 100_000e18;
 
-    /// @notice Middle stake tier: 5,000,000 AGC.
-    uint256 public constant TIER_2 = 5_000_000e18;
+    /// @notice Stake tier: 300,000 AGC.
+    uint256 public constant TIER_2 = 300_000e18;
+
+    /// @notice Stake tier: 500,000 AGC.
+    uint256 public constant TIER_3 = 500_000e18;
+
+    /// @notice Stake tier: 1,000,000 AGC.
+    uint256 public constant TIER_4 = 1_000_000e18;
+
+    /// @notice Stake tier: 2,000,000 AGC.
+    uint256 public constant TIER_5 = 2_000_000e18;
+
+    /// @notice Stake tier: 5,000,000 AGC.
+    uint256 public constant TIER_6 = 5_000_000e18;
 
     /// @notice Largest stake tier: 10,000,000 AGC.
-    uint256 public constant TIER_3 = 10_000_000e18;
+    uint256 public constant TIER_7 = 10_000_000e18;
 
     /// @notice Burn share of every settled pot, in basis points (30 = 0.3%).
     uint256 public constant BURN_BPS = 30;
@@ -304,9 +317,9 @@ contract PlinkoRoyale {
     // Constant views (interface compatibility with the design sketch)
     // ------------------------------------------------------------------
 
-    /// @notice The three allowed stake amounts, in token wei.
-    function stakeTiers() external pure returns (uint256[3] memory) {
-        return [TIER_1, TIER_2, TIER_3];
+    /// @notice The seven allowed stake amounts, in token wei.
+    function stakeTiers() external pure returns (uint256[7] memory) {
+        return [TIER_1, TIER_2, TIER_3, TIER_4, TIER_5, TIER_6, TIER_7];
     }
 
     /// @notice Slot multipliers scaled x100, slots 0..8 (edges high,
@@ -500,13 +513,17 @@ contract PlinkoRoyale {
     ///      to audit. Players withdraw winnings first if they want to
     ///      re-stake them.
     /// @param roundId Must be the currently open round (see currentRound).
-    /// @param amount Must be exactly one of the three stake tiers.
+    /// @param amount Must be exactly one of the seven stake tiers.
     /// @param clientSeed Optional player entropy (bytes32(0) if unused).
     ///        It cannot bias the outcome: the VRF word is unknown to
     ///        everyone until after entries close.
     function enter(uint256 roundId, uint256 amount, bytes32 clientSeed) external nonReentrant {
         require(roundId == _currentRoundId(), "round not open");
-        require(amount == TIER_1 || amount == TIER_2 || amount == TIER_3, "amount not a stake tier");
+        require(
+            amount == TIER_1 || amount == TIER_2 || amount == TIER_3 || amount == TIER_4 || amount == TIER_5
+                || amount == TIER_6 || amount == TIER_7,
+            "amount not a stake tier"
+        );
         Round storage r = _rounds[roundId];
         require(r.phase == Phase.Open, "round not open");
         require(r.players.length < MAX_PLAYERS, "round full");
