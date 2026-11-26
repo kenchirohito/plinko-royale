@@ -1,0 +1,931 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Plinko Royale — Testnet</title>
+<style>
+  :root {
+    --bg: #0e1220; --panel: #171d30; --panel2: #1f2742;
+    --text: #e8ecf6; --muted: #9aa5c4; --accent: #ffb340;
+    --good: #4ade80; --bad: #f87171; --line: #2a3352; --warn: #fbbf24;
+  }
+  * { box-sizing: border-box; }
+  body {
+    margin: 0; background: var(--bg); color: var(--text);
+    font-family: system-ui, -apple-system, "Segoe UI", Roboto, sans-serif;
+  }
+  .wrap { max-width: 1020px; margin: 0 auto; padding: 16px 16px 48px; }
+  .testnet-banner {
+    background: #3a2a05; border: 1px solid var(--warn); color: #fde68a;
+    border-radius: 10px; padding: 10px 14px; font-size: 14px; margin-bottom: 14px;
+  }
+  .testnet-banner b { color: var(--warn); }
+  header.top { display: flex; flex-wrap: wrap; gap: 10px; align-items: center; justify-content: space-between; }
+  h1 { font-size: 26px; margin: 4px 0 2px; }
+  h1 .accent { color: var(--accent); }
+  .sub { color: var(--muted); margin: 0 0 14px; font-size: 14px; }
+  .wallet-box { text-align: right; font-size: 13px; color: var(--muted); }
+  .wallet-box .addr { color: var(--text); font-family: ui-monospace, Menlo, Consolas, monospace; font-size: 12.5px; }
+  button {
+    background: var(--panel2); color: var(--text); border: 1px solid var(--line);
+    border-radius: 10px; padding: 9px 14px; font-size: 14px; cursor: pointer;
+  }
+  button:hover:not(:disabled) { border-color: var(--accent); }
+  button:disabled { opacity: .45; cursor: default; }
+  button.primary { background: var(--accent); color: #1a1200; border: 0; font-weight: 700; }
+  button.big { width: 100%; padding: 13px; font-size: 16px; margin-top: 10px; }
+  .layout { display: flex; gap: 18px; flex-wrap: wrap; align-items: flex-start; margin-top: 8px; }
+  .board-box { background: var(--panel); border: 1px solid var(--line); border-radius: 14px; padding: 12px; }
+  canvas { display: block; max-width: 100%; height: auto; }
+  .side { flex: 1 1 380px; min-width: 300px; }
+  .card { background: var(--panel); border: 1px solid var(--line); border-radius: 14px; padding: 16px; margin-bottom: 14px; }
+  .card h2 { font-size: 15px; margin: 0 0 10px; letter-spacing: .02em; }
+  .row { display: flex; gap: 8px; align-items: center; flex-wrap: wrap; }
+  .kv { font-size: 14px; color: var(--muted); line-height: 1.8; }
+  .kv b { color: var(--text); }
+  .phase-badge {
+    display: inline-block; padding: 2px 10px; border-radius: 999px; font-size: 12px; font-weight: 700;
+    background: var(--panel2); border: 1px solid var(--line); color: var(--accent);
+  }
+  .countdown { font-size: 22px; font-weight: 800; color: var(--text); font-variant-numeric: tabular-nums; }
+  .tiers { display: flex; gap: 8px; flex-wrap: wrap; }
+  .tier {
+    flex: 1; min-width: 90px; padding: 10px 6px; text-align: center;
+    background: var(--panel2); border: 2px solid var(--line);
+    border-radius: 10px; cursor: pointer; font-size: 14px; user-select: none;
+  }
+  .tier small { display: block; color: var(--muted); font-size: 11px; margin-top: 2px; }
+  .tier.sel { border-color: var(--accent); color: var(--accent); }
+  .tier.disabled { opacity: .35; pointer-events: none; }
+  input[type="text"], input[type="number"] {
+    background: var(--panel2); border: 1px solid var(--line); color: var(--text);
+    border-radius: 8px; padding: 8px 10px; font-size: 13px; width: 100%;
+    font-family: ui-monospace, Menlo, Consolas, monospace;
+  }
+  label.small { font-size: 12px; color: var(--muted); display: block; margin: 10px 0 4px; }
+  .status { min-height: 20px; font-size: 13.5px; color: var(--accent); margin-top: 10px; line-height: 1.5; word-break: break-word; }
+  .status.err { color: var(--bad); }
+  .status.ok { color: var(--good); }
+  .status a { color: inherit; }
+  table { width: 100%; border-collapse: collapse; font-size: 13px; }
+  th, td { padding: 6px 6px; text-align: right; border-bottom: 1px solid var(--line); }
+  th:first-child, td:first-child { text-align: left; }
+  th { color: var(--muted); font-weight: 600; font-size: 11px; text-transform: uppercase; }
+  tr.me td { background: rgba(255,179,64,.08); }
+  .pos { color: var(--good); } .neg { color: var(--bad); }
+  .summary { font-size: 13px; line-height: 1.7; color: var(--muted); }
+  .summary b { color: var(--text); }
+  .chips { display: flex; flex-wrap: wrap; gap: 6px; margin-top: 6px; }
+  .chip {
+    font-size: 12px; background: var(--panel2); border: 1px solid var(--line);
+    border-radius: 999px; padding: 3px 10px; font-family: ui-monospace, Menlo, Consolas, monospace;
+  }
+  .chip.me { border-color: var(--accent); color: var(--accent); }
+  .how { font-size: 14px; line-height: 1.65; color: var(--muted); }
+  .how b, .how code { color: var(--text); }
+  .how code { font-family: ui-monospace, Menlo, Consolas, monospace; font-size: 12.5px;
+              background: var(--panel2); padding: 1px 5px; border-radius: 5px; }
+  .how a, .kv a { color: var(--accent); }
+  .muted { color: var(--muted); font-size: 13px; }
+  .actions { display: flex; flex-direction: column; gap: 8px; }
+  .actions button { width: 100%; }
+  .round-nav button { padding: 6px 12px; }
+  .round-nav input { width: 90px; text-align: center; }
+</style>
+</head>
+<body>
+<div class="wrap">
+  <div class="testnet-banner">
+    <b>TESTNET — uang mainan.</b> Ini BSC Testnet (chain 97). Token AGC di sini adalah
+    MockAGC untuk demo, <b>bukan</b> AGC asli, dan tidak bernilai. Jangan kirim dana asli ke alamat mana pun di halaman ini.
+  </div>
+
+  <header class="top">
+    <div>
+      <h1>Plinko <span class="accent">Royale</span></h1>
+      <p class="sub">PvP Plinko untuk ekosistem AGC — demo testnet, terhubung langsung ke smart contract.</p>
+    </div>
+    <div class="wallet-box">
+      <button id="connectBtn" class="primary">Hubungkan Wallet</button>
+      <div id="walletInfo" style="margin-top:6px"></div>
+    </div>
+  </header>
+
+  <div class="layout">
+    <div class="board-box"><canvas id="board" width="460" height="560"></canvas></div>
+
+    <div class="side">
+      <div class="card">
+        <h2>Ronde</h2>
+        <div class="row round-nav">
+          <button id="prevRoundBtn" title="Ronde sebelumnya">◀</button>
+          <input type="number" id="roundInput" min="0" step="1">
+          <button id="nextRoundBtn" title="Ronde berikutnya">▶</button>
+          <button id="liveRoundBtn">Ronde aktif</button>
+          <span class="phase-badge" id="phaseBadge">…</span>
+        </div>
+        <div class="kv" id="roundInfo" style="margin-top:8px">Memuat data on-chain…</div>
+        <div class="countdown" id="countdown"></div>
+        <div class="muted" style="margin-top:6px">Pemain yang sudah ikut:</div>
+        <div class="chips" id="playerChips"><span class="muted">—</span></div>
+      </div>
+
+      <div class="card">
+        <h2>Ikut ronde</h2>
+        <div class="kv">
+          Saldo AGC test di wallet: <b id="tokenBal">—</b>
+          <button id="mintBtn" style="margin-left:6px" disabled>Ambil 100jt AGC test (gratis)</button>
+        </div>
+        <label class="small">Pilih taruhan (tier tetap)</label>
+        <div class="tiers" id="tiers"></div>
+        <label class="small">Client seed (opsional — entropi tambahan dari kamu; kosongkan untuk acak)</label>
+        <div class="row">
+          <input type="text" id="seedInput" placeholder="acak otomatis" style="flex:1">
+          <button id="seedBtn" title="Buat seed acak baru">🎲</button>
+        </div>
+        <button id="enterBtn" class="primary big" disabled>Ikut Ronde</button>
+        <div class="status" id="enterStatus"></div>
+      </div>
+
+      <div class="card">
+        <h2>Aksi ronde (siapa pun boleh)</h2>
+        <div class="actions">
+          <button id="drawBtn" disabled>Draw (minta angka acak VRF)</button>
+          <button id="settleBtn" disabled>Settle (bagi pot)</button>
+          <button id="refundBtn" disabled>Refund (kembalikan taruhan)</button>
+        </div>
+        <div class="muted" id="actionHint" style="margin-top:8px"></div>
+        <div class="status" id="actionStatus"></div>
+      </div>
+
+      <div class="card" id="resultCard" style="display:none">
+        <h2>Hasil ronde</h2>
+        <table>
+          <thead><tr>
+            <th>Pemain</th><th>Taruhan</th><th>Slot</th><th>Mult</th><th>Payout</th><th>Net</th>
+          </tr></thead>
+          <tbody id="resultBody"></tbody>
+        </table>
+        <div class="summary" id="summary" style="margin-top:10px"></div>
+        <button id="animBtn" style="margin-top:10px; display:none">▶ Putar animasi bola saya</button>
+      </div>
+
+      <div class="card">
+        <h2>Saldo game</h2>
+        <div class="kv">
+          Bisa ditarik: <b id="gameBal">—</b> AGC<br>
+          Terkunci di ronde berjalan: <b id="stakedBal">—</b> AGC
+        </div>
+        <button id="withdrawBtn" class="primary" style="margin-top:8px" disabled>Tarik semua ke wallet</button>
+        <div class="status" id="withdrawStatus"></div>
+      </div>
+
+      <div class="card how">
+        <h2 style="color:var(--text)">Cara main</h2>
+        <p>Ronde berjalan tiap <b>5 menit</b>. Pilih taruhan tetap (<b>2jt / 5jt / 10jt AGC</b>),
+        satu entri per alamat per ronde. Setelah ronde tutup, siapa pun bisa menekan <b>Draw</b> —
+        Chainlink VRF mengeluarkan satu angka acak yang menentukan slot semua pemain
+        (bola jatuh lewat 8 baris pasak ke 9 slot; pengali tepi 11,6×, tengah 0,4×).</p>
+        <p><b>Settle</b> membagi pot: <b>0,3% dibakar</b>, <b>0,3% fee operasional</b>,
+        99,4% dibagi ke pemain sebanding skor (taruhan × pengali). Payout masuk ke saldo game,
+        tarik kapan saja. Ronde dengan &lt;2 pemain, atau yang tidak di-draw / tidak dapat angka acak
+        dalam 1 jam, bisa di-<b>refund</b> penuh.</p>
+        <p>Kontrak game:
+          <a id="gameLink" href="#" target="_blank" rel="noopener">PlinkoRoyale</a> ·
+          Token test:
+          <a id="tokenLink" href="#" target="_blank" rel="noopener">MockAGC</a>
+          (testnet BscScan)</p>
+        <p class="muted">Butuh tBNB untuk gas: ambil gratis di
+          <a href="https://www.bnbchain.org/en/testnet-faucet" target="_blank" rel="noopener">faucet BNB Chain testnet</a>.</p>
+      </div>
+    </div>
+  </div>
+</div>
+
+<script src="https://cdn.jsdelivr.net/npm/ethers@6.13.4/dist/ethers.umd.min.js" integrity="sha384-6Zl0Pc8zjSz8KvmNeXRvUQgY4ryFb+BwDvKCmLYcBME0joAaru491tQgi9B7zsMM" crossorigin="anonymous"></script>
+<script>
+"use strict";
+/* =====================================================================
+   Plinko Royale — frontend testnet (satu file, ethers v6).
+   Halaman ini hanya membaca/menulis kontrak testnet yang sudah terdeploy.
+   Tidak ada private key di sini; semua tanda tangan lewat wallet pengguna.
+   ===================================================================== */
+
+// --- Konfigurasi -------------------------------------------------------------
+const CHAIN_ID = 97;                                   // BSC testnet
+const CHAIN_ID_HEX = "0x61";
+const RPC_URLS = [
+  "https://bsc-testnet-rpc.publicnode.com",
+  "https://data-seed-prebsc-1-s1.bnbchain.org:8545",
+  "https://data-seed-prebsc-2-s1.bnbchain.org:8545",
+];
+const RPC_URL = RPC_URLS[0]; // untuk wallet add-chain; baca data pakai rotasi di bawah
+const EXPLORER = "https://testnet.bscscan.com";
+const GAME_ADDR  = "0x8643ab8Fe68aBC315aC7D38b5518e6cc3644F0a7"; // PlinkoRoyale (redeploy 2026-11-26, audit eksternal LOW-1 + view baru)
+const TOKEN_ADDR = "0x17356908F432eD7F2a4b378F19b5c869b872e21E"; // MockAGC (testnet)
+const MULTICALL3 = "0xcA11bde05977b3631167028862bE2a173976CA11"; // batch eth_call (audit MEDIUM-1)
+const DEPLOY_BLOCK = 144931878;                        // blok deploy PlinkoRoyale (referensi saja; daftar pemain kini via playersOf)
+const MINT_AMOUNT = ethers.parseUnits("100000000", 18); // 100jt AGC test per klik
+
+const GAME_ABI = [
+  "function currentRound() view returns (uint256 id, uint64 opensAt, uint64 closesAt)",
+  "function roundDetail(uint256 roundId) view returns (uint8 phase, uint64 opensAt, uint64 closesAt, uint256 totalStaked, uint256 playerCount, uint256 requestId, uint256 burned, uint256 feePaid, uint256 dust)",
+  "function enter(uint256 roundId, uint256 amount, bytes32 clientSeed)",
+  "function draw(uint256 roundId) payable",
+  "function drawFee(uint256 gasPriceWei) view returns (uint256)",
+  "function settle(uint256 roundId)",
+  "function refund(uint256 roundId)",
+  "function withdraw(uint256 amount)",
+  "function balanceOf(address player) view returns (uint256)",
+  "function stakedOf(address player) view returns (uint256)",
+  "function entryOf(uint256 roundId, address player) view returns (uint256 stake, bytes32 clientSeed, uint8 slot, uint256 payout)",
+  "function result(uint256 roundId, address player) view returns (uint256 staked, uint256 payout, uint8 slot)",
+  "function randomWordOf(uint256 roundId) view returns (uint256)",
+  "function wordReceivedOf(uint256 roundId) view returns (bool)",
+  "function drawRequestedAtOf(uint256 roundId) view returns (uint256)",
+  "function playersOf(uint256 roundId) view returns (address[])",
+  "function MAX_PLAYERS() view returns (uint256)",
+  "function stakeTiers() view returns (uint256[3])",
+  "function multipliersX100() view returns (uint16[9])",
+  "event Entered(uint256 indexed roundId, address indexed player, uint256 amount, bytes32 clientSeed)",
+  "event DrawRequested(uint256 indexed roundId, uint256 requestId)",
+  "event RandomFulfilled(uint256 indexed roundId, uint256 word)",
+  "event Settled(uint256 indexed roundId, uint256 pot, uint256 burned, uint256 feePaid, uint256 dust)",
+  "event Refunded(uint256 indexed roundId, uint256 pot)",
+  "event Withdrawn(address indexed player, uint256 amount)",
+];
+const TOKEN_ABI = [
+  "function balanceOf(address) view returns (uint256)",
+  "function allowance(address,address) view returns (uint256)",
+  "function approve(address,uint256) returns (bool)",
+  "function mint(address,uint256)",
+  "function decimals() view returns (uint8)",
+  "function symbol() view returns (string)",
+];
+const MULTICALL3_ABI = [
+  "function aggregate3(tuple(address target, bool allowFailure, bytes callData)[] calls) view returns (tuple(bool success, bytes returnData)[] returnData)",
+];
+
+// --- State -------------------------------------------------------------------
+let rpcIdx = 0;
+let readProvider = new ethers.JsonRpcProvider(RPC_URLS[0], CHAIN_ID, { staticNetwork: true });
+let gameRead  = new ethers.Contract(GAME_ADDR, GAME_ABI, readProvider);
+let tokenRead = new ethers.Contract(TOKEN_ADDR, TOKEN_ABI, readProvider);
+let multicall = new ethers.Contract(MULTICALL3, MULTICALL3_ABI, readProvider);
+
+// RPC publik kadang gagal sesaat (rate-limit / jaringan HP): ganti endpoint
+// dan bangun ulang kontrak baca. Error hanya ditampilkan setelah beberapa
+// kali gagal berturut-turut, supaya satu refresh yang gagal tidak menakuti.
+let readFailStreak = 0;
+function rotateRpc() {
+  rpcIdx = (rpcIdx + 1) % RPC_URLS.length;
+  const old = readProvider;
+  readProvider = new ethers.JsonRpcProvider(RPC_URLS[rpcIdx], CHAIN_ID, { staticNetwork: true });
+  gameRead  = new ethers.Contract(GAME_ADDR, GAME_ABI, readProvider);
+  tokenRead = new ethers.Contract(TOKEN_ADDR, TOKEN_ABI, readProvider);
+  multicall = new ethers.Contract(MULTICALL3, MULTICALL3_ABI, readProvider);
+  if (old && old.destroy) old.destroy(); // hentikan timer polling provider lama (audit INFO-1)
+}
+
+let signer = null, account = null;         // wallet terhubung (null = mode baca)
+let game = null, token = null;             // kontrak dengan signer
+let tiers = [];                            // [2jt, 5jt, 10jt] dalam wei (BigInt)
+let maxPlayers = 500;                      // batas pemain per ronde (dibaca dari kontrak saat init)
+let multX100 = [1160,300,140,70,40,70,140,300,1160];
+let selectedTier = 0;
+let liveRoundId = null;                    // ronde yang sedang dibuka (dari chain)
+let viewRoundId = null;                    // ronde yang sedang ditampilkan
+let followLive = true;                     // ikut ronde aktif secara otomatis
+let chainTimeOffset = 0;                   // selisih jam chain vs jam lokal (detik)
+let lastDetail = null;                     // roundDetail terakhir untuk viewRoundId
+let lastWord = 0n;
+let lastWordReceived = false;              // wordReceivedOf(viewRoundId) — gate settle (audit LOW-5)
+let lastDrawRequestedAt = 0;               // drawRequestedAtOf(viewRoundId) — gate refund (audit LOW-6)
+let playersCache = new Map();              // roundId -> {list} (dari playersOf)
+let myEntry = null;                        // entryOf(viewRound, account)
+let tokenBalance = 0n, gameBalance = 0n;
+let busy = false;                          // sedang menunggu tx
+let animPlayedFor = new Set();             // ronde yang animasinya sudah diputar
+let renderResultsSeq = 0;                  // penjaga anti-tumpang-tindih renderResults
+
+const $ = id => document.getElementById(id);
+const PHASE_NAMES = ["Pendaftaran dibuka", "Menunggu draw", "Menunggu angka acak", "Selesai", "Di-refund"];
+
+// --- Util --------------------------------------------------------------------
+function fmtAGC(wei) {
+  // Tampilkan dalam AGC utuh, maks 2 desimal (nilai persis ada di title).
+  const s = ethers.formatUnits(wei, 18);
+  const [int, frac = ""] = s.split(".");
+  const intFmt = BigInt(int).toLocaleString("id-ID");
+  const f = frac.slice(0, 2).replace(/0+$/, "");
+  return f ? `${intFmt},${f}` : intFmt;
+}
+function fmtSigned(wei) { return (wei > 0n ? "+" : "") + fmtAGC(wei); }
+function shortAddr(a) { return a.slice(0, 6) + "…" + a.slice(-4); }
+function txLink(hash) { return `${EXPLORER}/tx/${hash}`; }
+function chainNow() { return Math.floor(Date.now() / 1000) + chainTimeOffset; }
+
+function setStatus(el, msg, kind = "") {
+  el.className = "status" + (kind ? " " + kind : "");
+  el.innerHTML = msg;
+}
+const REVERT_ID = {
+  "round full": "Ronde sudah penuh (maks 500 pemain) — ikut ronde berikutnya ya, 5 menit lagi.",
+  "already entered": "Kamu sudah ikut ronde ini (satu entri per alamat).",
+  "round not open": "Ronde ini tidak sedang dibuka untuk pendaftaran.",
+  "amount not a stake tier": "Jumlah taruhan harus salah satu tier (2jt/5jt/10jt).",
+  "stake transfer failed": "Transfer taruhan gagal — cek saldo & allowance.",
+  "stake transfer taxed": "Token memotong transfer (tax) — entri ditolak kontrak.",
+  "round not awaiting draw": "Ronde ini tidak dalam status menunggu draw.",
+  "round still open": "Ronde masih dibuka — tunggu sampai tutup.",
+  "too few players, use refund": "Pemain kurang dari 2 — gunakan Refund.",
+  "insufficient VRF fee": "Fee VRF yang dikirim kurang.",
+  "fee refund failed": "Refund kelebihan fee VRF gagal.",
+  "round not awaiting random": "Ronde ini tidak sedang menunggu angka acak.",
+  "word not received yet": "Angka acak belum keluar — tunggu sebentar.",
+  "word received, settle instead": "Angka acak sudah keluar — gunakan Settle, bukan Refund.",
+  "refund not available yet": "Refund belum tersedia (tunggu batas 1 jam).",
+  "round already final": "Ronde sudah selesai (final).",
+  "insufficient balance": "Saldo game tidak cukup.",
+  "amount is zero": "Jumlah nol.",
+  "withdraw transfer failed": "Transfer withdraw gagal.",
+  "allowance too low": "Allowance token kurang — approve dulu.",
+  "balance too low": "Saldo token tidak cukup.",
+};
+function escHtml(s) {
+  return String(s).replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;")
+    .replace(/"/g, "&quot;").replace(/'/g, "&#39;");
+}
+function friendlyError(e) {
+  if (e && (e.code === "ACTION_REJECTED" || e.code === 4001)) return "Transaksi dibatalkan di wallet.";
+  const raw = (e && (e.reason || e.shortMessage || e.message)) || String(e);
+  for (const k in REVERT_ID) if (raw.includes(k)) return REVERT_ID[k];
+  if (/insufficient funds/i.test(raw)) return "tBNB untuk gas tidak cukup — ambil dari faucet testnet.";
+  if (/network|chain/i.test(raw)) return "Jaringan salah — pindah ke BSC Testnet (chain 97).";
+  // Pesan mentah dari RPC/wallet di-escape sebelum masuk innerHTML (audit LOW-4).
+  return escHtml(raw.length > 220 ? raw.slice(0, 220) + "…" : raw);
+}
+// --- Wallet ------------------------------------------------------------------
+async function ensureChain() {
+  const chainId = await window.ethereum.request({ method: "eth_chainId" });
+  if (chainId === CHAIN_ID_HEX) return true;
+  try {
+    await window.ethereum.request({
+      method: "wallet_switchEthereumChain",
+      params: [{ chainId: CHAIN_ID_HEX }],
+    });
+    return true;
+  } catch (e) {
+    if (e.code === 4902) { // chain belum dikenal wallet -> tambahkan
+      await window.ethereum.request({
+        method: "wallet_addEthereumChain",
+        params: [{
+          chainId: CHAIN_ID_HEX,
+          chainName: "BNB Smart Chain Testnet",
+          nativeCurrency: { name: "Test BNB", symbol: "tBNB", decimals: 18 },
+          rpcUrls: [RPC_URL],
+          blockExplorerUrls: [EXPLORER],
+        }],
+      });
+      return true;
+    }
+    throw e;
+  }
+}
+
+async function connect() {
+  const btn = $("connectBtn");
+  if (!window.ethereum) {
+    setStatus($("enterStatus"), "Wallet tidak terdeteksi. Pasang MetaMask (atau wallet EVM lain), lalu muat ulang halaman ini.", "err");
+    return;
+  }
+  try {
+    btn.disabled = true;
+    await ensureChain();
+    const bp = new ethers.BrowserProvider(window.ethereum, CHAIN_ID);
+    signer = await bp.getSigner();
+    account = await signer.getAddress();
+    game = new ethers.Contract(GAME_ADDR, GAME_ABI, signer);
+    token = new ethers.Contract(TOKEN_ADDR, TOKEN_ABI, signer);
+    btn.textContent = "Wallet terhubung";
+    await refreshAll();
+  } catch (e) {
+    setStatus($("enterStatus"), friendlyError(e), "err");
+  } finally {
+    btn.disabled = false;
+  }
+}
+$("connectBtn").onclick = connect;
+
+if (window.ethereum) {
+  window.ethereum.on("accountsChanged", () => location.reload());
+  window.ethereum.on("chainChanged", () => location.reload());
+}
+
+// --- Baca data on-chain --------------------------------------------------------
+async function fetchPlayers(roundId) {
+  // Daftar pemain dari view playersOf() (audit L-6) + entryOf() per pemain
+  // untuk jumlah taruhan & clientSeed. entryOf dibaca lewat Multicall3
+  // dalam SATU eth_call (audit MEDIUM-1: tanpa ini, ronde 500 pemain =
+  // 500 request paralel tiap refresh dan RPC publik kena rate-limit).
+  // Fallback ke panggilan paralel biasa bila Multicall3 gagal.
+  const addrs = await gameRead.playersOf(roundId);
+  let list;
+  try {
+    const iface = gameRead.interface;
+    const calls = addrs.map(player => ({
+      target: GAME_ADDR, allowFailure: false,
+      callData: iface.encodeFunctionData("entryOf", [roundId, player]),
+    }));
+    const res = calls.length ? await multicall.aggregate3(calls) : [];
+    list = addrs.map((player, i) => {
+      const en = iface.decodeFunctionResult("entryOf", res[i].returnData);
+      return { player, amount: en.stake, clientSeed: en.clientSeed };
+    });
+  } catch (e) {
+    list = await Promise.all(addrs.map(async player => {
+      const en = await gameRead.entryOf(roundId, player);
+      return { player, amount: en.stake, clientSeed: en.clientSeed };
+    }));
+  }
+  playersCache.set(roundId, { list });
+  return list;
+}
+
+async function refreshAll() {
+  try {
+    const [cur, blk] = await Promise.all([
+      gameRead.currentRound(),
+      readProvider.getBlock("latest"),
+    ]);
+    liveRoundId = Number(cur.id);
+    chainTimeOffset = Number(blk.timestamp) - Math.floor(Date.now() / 1000);
+    if (viewRoundId === null || followLive) viewRoundId = liveRoundId;
+    $("roundInput").value = viewRoundId;
+
+    const d = await gameRead.roundDetail(viewRoundId);
+    lastDetail = {
+      phase: Number(d.phase), opensAt: Number(d.opensAt), closesAt: Number(d.closesAt),
+      totalStaked: d.totalStaked, playerCount: Number(d.playerCount),
+      burned: d.burned, feePaid: d.feePaid, dust: d.dust,
+    };
+    lastWord = lastDetail.phase >= 2 ? await gameRead.randomWordOf(viewRoundId) : 0n;
+    // Gate settle/refund yang persis (audit LOW-5/LOW-6): pakai flag
+    // wordReceivedOf (bukan word != 0) dan timestamp drawRequestedAtOf.
+    if (lastDetail.phase >= 2) {
+      const [wr, dra] = await Promise.all([
+        gameRead.wordReceivedOf(viewRoundId),
+        gameRead.drawRequestedAtOf(viewRoundId),
+      ]);
+      lastWordReceived = wr;
+      lastDrawRequestedAt = Number(dra);
+    } else {
+      lastWordReceived = false;
+      lastDrawRequestedAt = 0;
+    }
+
+    // Pemain: dari view playersOf (ronde final tidak berubah lagi)
+    if (!playersCache.has(viewRoundId) || lastDetail.phase < 3) {
+      await fetchPlayers(viewRoundId);
+    }
+
+    if (account) {
+      const [tb, gb, st, en, bnb] = await Promise.all([
+        tokenRead.balanceOf(account),
+        gameRead.balanceOf(account),
+        gameRead.stakedOf(account),
+        gameRead.entryOf(viewRoundId, account),
+        readProvider.getBalance(account),
+      ]);
+      tokenBalance = tb; gameBalance = gb;
+      myEntry = en.stake > 0n ? en : null;
+      $("walletInfo").innerHTML =
+        `<span class="addr">${shortAddr(account)}</span> · ${ethers.formatEther(bnb).slice(0, 8)} tBNB<br>BSC Testnet (97)`;
+      $("gameBal").textContent = fmtAGC(gb);
+      $("stakedBal").textContent = fmtAGC(st);
+    }
+    readFailStreak = 0;
+    render();
+  } catch (e) {
+    readFailStreak++;
+    rotateRpc();
+    if (readFailStreak >= 3) {
+      setStatus($("enterStatus"), "Gagal membaca data chain: " + friendlyError(e) + " (mencoba RPC lain…)", "err");
+    }
+  }
+}
+
+// --- Render --------------------------------------------------------------------
+function render() {
+  const d = lastDetail;
+  if (!d) return;
+  if (d.phase < 3 && !animating) drawBoard(null); // papan bersih sebelum hasil asli keluar
+  const phase = d.phase;
+  const wordArrived = lastWordReceived;
+
+  let badge = PHASE_NAMES[phase];
+  if (phase === 2 && wordArrived) badge = "Siap settle";
+  if (viewRoundId > liveRoundId) badge = "Belum dibuka";
+  $("phaseBadge").textContent = badge;
+
+  const openTime = new Date(d.opensAt * 1000).toLocaleTimeString("id-ID");
+  const closeTime = new Date(d.closesAt * 1000).toLocaleTimeString("id-ID");
+  $("roundInfo").innerHTML =
+    `Ronde <b>#${viewRoundId}</b>${viewRoundId === liveRoundId ? " (aktif)" : ""} · ${openTime} – ${closeTime}<br>` +
+    `Pot: <b>${fmtAGC(d.totalStaked)} AGC</b> · Pemain: <b>${d.playerCount}/${maxPlayers}</b>`;
+
+  // Chip pemain
+  const players = (playersCache.get(viewRoundId) || { list: [] }).list;
+  $("playerChips").innerHTML = players.length
+    ? players.map(p =>
+        `<span class="chip${account && p.player.toLowerCase() === account.toLowerCase() ? " me" : ""}" title="${p.player}">${shortAddr(p.player)} · ${fmtAGC(p.amount)}</span>`
+      ).join("")
+    : `<span class="muted">belum ada</span>`;
+
+  // Tier + saldo token
+  $("tokenBal").textContent = account ? fmtAGC(tokenBalance) + " AGC" : "— (hubungkan wallet)";
+  renderTiers();
+
+  // Tombol ikut ronde
+  const enterBtn = $("enterBtn");
+  const roundFull = d.playerCount >= maxPlayers;
+  const canEnter = !!account && !busy && viewRoundId === liveRoundId && phase === 0 && !myEntry && !roundFull;
+  enterBtn.disabled = !canEnter;
+  if (!account) enterBtn.textContent = "Hubungkan wallet dulu";
+  else if (myEntry) enterBtn.textContent = `Sudah ikut (${fmtAGC(myEntry.stake)} AGC)`;
+  else if (viewRoundId !== liveRoundId) enterBtn.textContent = "Hanya bisa ikut ronde aktif";
+  else if (phase !== 0) enterBtn.textContent = "Pendaftaran sudah tutup";
+  else if (roundFull) enterBtn.textContent = `Ronde penuh (${maxPlayers} pemain)`;
+  else enterBtn.textContent = "Ikut Ronde";
+
+  // Tombol aksi ronde
+  $("drawBtn").disabled   = !account || busy || phase !== 1 || d.playerCount < 2;
+  $("settleBtn").disabled = !account || busy || phase !== 2 || !wordArrived;
+  // Refund: aktif hanya bila kondisinya persis terpenuhi (audit LOW-6),
+  // supaya klik tidak membuang gas untuk tx yang pasti revert.
+  // Phase 1: pemain < 2, atau lewat closesAt + DRAW_TIMEOUT (1 jam).
+  // Phase 2: word belum datang DAN lewat drawRequestedAt + RANDOM_TIMEOUT.
+  const now = chainNow();
+  const refundLikely =
+    (phase === 1 && (d.playerCount < 2 || now > d.closesAt + 3600)) ||
+    (phase === 2 && !wordArrived && lastDrawRequestedAt > 0 && now > lastDrawRequestedAt + 3600);
+  $("refundBtn").disabled = !account || busy || !refundLikely;
+
+  let hint = "";
+  if (phase === 0) hint = "Ronde masih menerima pendaftaran.";
+  else if (phase === 1 && d.playerCount >= 2) hint = "Ronde tutup. Tekan Draw untuk meminta angka acak (fee VRF dalam tBNB, kelebihan dikembalikan).";
+  else if (phase === 1) hint = "Pemain kurang dari 2 — ronde ini hanya bisa di-refund.";
+  else if (phase === 2 && !wordArrived) hint = "Draw terkirim. Menunggu Chainlink VRF… (biasanya < 1 menit). Refund baru bisa setelah 1 jam.";
+  else if (phase === 2 && wordArrived) hint = "Angka acak sudah keluar. Tekan Settle untuk membagi pot.";
+  else if (phase === 3) hint = "Ronde selesai. Payout sudah masuk ke saldo game masing-masing pemain.";
+  else if (phase === 4) hint = "Ronde di-refund penuh (tanpa burn/fee).";
+  $("actionHint").textContent = hint;
+
+  $("mintBtn").disabled = !account || busy;
+  $("withdrawBtn").disabled = !account || busy || gameBalance === 0n;
+
+  renderResults(players);
+  tickCountdown();
+}
+
+function renderTiers() {
+  const el = $("tiers");
+  el.innerHTML = "";
+  tiers.forEach((t, i) => {
+    const div = document.createElement("div");
+    div.className = "tier" + (i === selectedTier ? " sel" : "") + (account && t > tokenBalance ? " disabled" : "");
+    div.innerHTML = fmtAGC(t) + "<small>AGC</small>";
+    div.onclick = () => { selectedTier = i; renderTiers(); };
+    el.appendChild(div);
+  });
+}
+
+function tickCountdown() {
+  const d = lastDetail;
+  if (!d) return;
+  const el = $("countdown");
+  const now = chainNow();
+  if (d.phase === 0 && viewRoundId === liveRoundId) {
+    const s = Math.max(0, d.closesAt - now);
+    el.textContent = `Tutup dalam ${Math.floor(s / 60)}:${String(s % 60).padStart(2, "0")}`;
+  } else if (d.phase === 0) {
+    el.textContent = "";
+  } else {
+    el.textContent = "";
+  }
+}
+setInterval(tickCountdown, 1000);
+
+async function renderResults(players) {
+  const card = $("resultCard");
+  const d = lastDetail;
+  if (!d || (d.phase !== 3 && d.phase !== 4)) { card.style.display = "none"; return; }
+  card.style.display = "block";
+  const tbody = $("resultBody");
+  tbody.innerHTML = "";
+  if (d.phase === 4) {
+    $("summary").innerHTML = `Ronde di-refund. Pot <b>${fmtAGC(d.totalStaked)} AGC</b> dikembalikan penuh ke saldo game pemain (tanpa burn, tanpa fee).`;
+    $("animBtn").style.display = "none";
+    return;
+  }
+  // Settled: slot & payout dihitung LOKAL dari word on-chain + daftar
+  // pemain (audit MEDIUM-1: tanpa ini, tiap refresh menembak result()
+  // per pemain — 500 request untuk ronde penuh). Rumusnya identik dengan
+  // kontrak: payout = floor(pool × stake×mult / Σ stake×mult).
+  // Baris dibangun di fragment lalu dipasang sekali di akhir (dengan
+  // penjaga urutan) supaya panggilan renderResults yang tumpang tindih
+  // tidak menggandakan baris.
+  const mySeq = ++renderResultsSeq;
+  const ridSnap = viewRoundId, wordSnap = lastWord;
+  const pool = d.totalStaked - d.burned - d.feePaid;
+  const scored = players.map(p => {
+    const slot = slotOf(wordSnap, ridSnap, p.player, p.clientSeed);
+    return { player: p.player, stake: p.amount, slot, score: p.amount * BigInt(multX100[slot]) };
+  });
+  const totalScore = scored.reduce((s, r) => s + r.score, 0n);
+  const rows = scored.map(r => ({ ...r, payout: totalScore > 0n ? (pool * r.score) / totalScore : 0n }));
+  if (mySeq !== renderResultsSeq) return; // sudah ada panggilan yang lebih baru
+  let sumPay = 0n;
+  const frag = document.createDocumentFragment();
+  for (const r of rows) {
+    sumPay += r.payout;
+    const net = r.payout - r.stake;
+    const tr = document.createElement("tr");
+    if (account && r.player.toLowerCase() === account.toLowerCase()) tr.className = "me";
+    tr.innerHTML =
+      `<td title="${r.player}">${shortAddr(r.player)}${account && r.player.toLowerCase() === account.toLowerCase() ? " (kamu)" : ""}</td>` +
+      `<td>${fmtAGC(r.stake)}</td><td>${r.slot}</td><td>${(multX100[r.slot] / 100).toFixed(1)}×</td>` +
+      `<td title="${ethers.formatUnits(r.payout, 18)}">${fmtAGC(r.payout)}</td>` +
+      `<td class="${net >= 0n ? "pos" : "neg"}">${fmtSigned(net)}</td>`;
+    frag.appendChild(tr);
+  }
+  tbody.innerHTML = "";
+  tbody.appendChild(frag);
+  $("summary").innerHTML =
+    `Pot <b>${fmtAGC(d.totalStaked)}</b> AGC<br>` +
+    `Dibakar (0,3%) <b>${fmtAGC(d.burned)}</b> · Fee operasional (0,3%) <b>${fmtAGC(d.feePaid)}</b><br>` +
+    `Dibagikan <b>${fmtAGC(sumPay)}</b> · Debu pembulatan <b>${fmtAGC(d.dust)}</b><br>` +
+    `<span class="muted">Angka acak VRF: <span style="font-family:ui-monospace,monospace;font-size:11px">${lastWord.toString()}</span></span>`;
+
+  // Animasi bola hasil asli: diputar sekali per ronde setelah settle,
+  // untuk semua pemain (maks 8 bola; kalau lebih, bola sendiri saja).
+  // Bola TIDAK pernah jatuh sebelum hasil asli keluar. Snapshot
+  // {roundId, word} diteruskan eksplisit (audit LOW-5) supaya ganti ronde
+  // di tengah animasi tidak mencampur data; penanda "sudah diputar"
+  // dipasang di dalam playSettleAnimations setelah cek animating.
+  const me = account && rows.find(r => r.player.toLowerCase() === account.toLowerCase());
+  $("animBtn").style.display = me ? "inline-block" : "none";
+  if (!animPlayedFor.has(ridSnap) && !animating) {
+    playSettleAnimations(rows, players, me, ridSnap, wordSnap);
+  }
+}
+
+// Putar animasi bola semua pemain secara berurutan (jalur dari word on-chain).
+async function playSettleAnimations(rows, players, me, roundId, word) {
+  if (animating || rows.length === 0) return;
+  animPlayedFor.add(roundId);
+  const seedOf = addr => {
+    const p = players.find(x => x.player.toLowerCase() === addr.toLowerCase());
+    return p ? p.clientSeed : null;
+  };
+  let queue = rows.slice();
+  if (queue.length > 8) queue = me ? [me] : queue.slice(0, 8);
+  cv.scrollIntoView({ behavior: "smooth", block: "center" });
+  for (const r of queue) {
+    const seed = seedOf(r.player);
+    if (!seed) continue;
+    const bits = myPathBits(roundId, r.player, seed, word);
+    await animateBits(bits);
+    await new Promise(res => setTimeout(res, 350));
+  }
+}
+// --- Aksi (transaksi) ----------------------------------------------------------
+async function runTx(statusEl, label, fn) {
+  if (busy) return;
+  busy = true; render();
+  try {
+    setStatus(statusEl, label + " — konfirmasi di wallet…");
+    const tx = await fn();
+    setStatus(statusEl, `${label} terkirim. Menunggu konfirmasi… <a href="${txLink(tx.hash)}" target="_blank" rel="noopener">lihat tx</a>`);
+    await tx.wait();
+    setStatus(statusEl, `${label} berhasil. <a href="${txLink(tx.hash)}" target="_blank" rel="noopener">lihat tx</a>`, "ok");
+  } catch (e) {
+    setStatus(statusEl, friendlyError(e), "err");
+  } finally {
+    busy = false;
+    await refreshAll();
+  }
+}
+
+$("mintBtn").onclick = () => runTx($("enterStatus"), "Ambil AGC test",
+  () => token.mint(account, MINT_AMOUNT));
+
+$("seedBtn").onclick = () => { $("seedInput").value = ethers.hexlify(ethers.randomBytes(32)); };
+
+function readClientSeed() {
+  const v = $("seedInput").value.trim();
+  if (!v) return ethers.hexlify(ethers.randomBytes(32));
+  if (/^0x[0-9a-fA-F]{64}$/.test(v)) return v;
+  return ethers.id(v); // teks bebas -> keccak256 -> bytes32
+}
+
+$("enterBtn").onclick = async () => {
+  if (!account || busy) return;
+  const amount = tiers[selectedTier];
+  if (tokenBalance < amount) {
+    setStatus($("enterStatus"), "Saldo AGC test kurang. Klik “Ambil 100jt AGC test” dulu.", "err");
+    return;
+  }
+  busy = true; render();
+  try {
+    const allowance = await tokenRead.allowance(account, GAME_ADDR);
+    if (allowance < amount) {
+      setStatus($("enterStatus"), "Approve token — konfirmasi di wallet…");
+      const atx = await token.approve(GAME_ADDR, amount);
+      setStatus($("enterStatus"), `Approve terkirim… <a href="${txLink(atx.hash)}" target="_blank" rel="noopener">lihat tx</a>`);
+      await atx.wait();
+    }
+    const seed = readClientSeed();
+    setStatus($("enterStatus"), "Ikut ronde — konfirmasi di wallet…");
+    const tx = await game.enter(viewRoundId, amount, seed);
+    setStatus($("enterStatus"), `Entri terkirim… <a href="${txLink(tx.hash)}" target="_blank" rel="noopener">lihat tx</a>`);
+    await tx.wait();
+    setStatus($("enterStatus"), `Berhasil ikut ronde #${viewRoundId} dengan ${fmtAGC(amount)} AGC. <a href="${txLink(tx.hash)}" target="_blank" rel="noopener">lihat tx</a>`, "ok");
+  } catch (e) {
+    setStatus($("enterStatus"), friendlyError(e), "err");
+  } finally {
+    busy = false;
+    await refreshAll();
+  }
+};
+
+$("drawBtn").onclick = async () => {
+  if (!account || busy) return;
+  busy = true; render();
+  try {
+    // Quote fee VRF pada gas price saat ini, kirim +50% buffer DAN
+    // gasPrice yang sama persis di tx (audit LOW-2: kontrak menghitung
+    // harga VRF dari tx.gasprice wallet; tanpa ini quote bisa meleset
+    // dan tx revert "insufficient VRF fee". Kelebihan dikembalikan.)
+    const feeData = await readProvider.getFeeData();
+    const gasPrice = feeData.gasPrice ?? ethers.parseUnits("1", "gwei");
+    const fee = await gameRead.drawFee(gasPrice);
+    const value = (fee * 150n) / 100n;
+    setStatus($("actionStatus"), `Draw — fee VRF ≈ ${ethers.formatEther(fee)} tBNB. Konfirmasi di wallet…`);
+    const tx = await game.draw(viewRoundId, { value, gasPrice });
+    setStatus($("actionStatus"), `Draw terkirim… <a href="${txLink(tx.hash)}" target="_blank" rel="noopener">lihat tx</a>`);
+    await tx.wait();
+    setStatus($("actionStatus"), `Draw berhasil. Menunggu angka acak dari Chainlink VRF… <a href="${txLink(tx.hash)}" target="_blank" rel="noopener">lihat tx</a>`, "ok");
+  } catch (e) {
+    setStatus($("actionStatus"), friendlyError(e), "err");
+  } finally {
+    busy = false;
+    await refreshAll();
+  }
+};
+
+$("settleBtn").onclick = () => runTx($("actionStatus"), "Settle", () => game.settle(viewRoundId));
+$("refundBtn").onclick = () => runTx($("actionStatus"), "Refund", () => game.refund(viewRoundId));
+$("withdrawBtn").onclick = () => runTx($("withdrawStatus"), "Withdraw", () => game.withdraw(gameBalance));
+
+// --- Navigasi ronde --------------------------------------------------------------
+function goRound(id) {
+  if (id < 0) id = 0;
+  viewRoundId = id;
+  followLive = (id === liveRoundId);
+  refreshAll();
+}
+$("prevRoundBtn").onclick = () => goRound(viewRoundId - 1);
+$("nextRoundBtn").onclick = () => goRound(viewRoundId + 1);
+$("liveRoundBtn").onclick = () => { followLive = true; viewRoundId = liveRoundId; refreshAll(); };
+$("roundInput").onchange = e => goRound(parseInt(e.target.value || "0", 10));
+
+// --- Papan Plinko + animasi --------------------------------------------------------
+const ROWS = 8, SLOTS = 9;
+const cv = $("board"), ctx = cv.getContext("2d");
+const W = cv.width, H = cv.height;
+const TOP_Y = 70, ROW_DY = 46, SLOT_Y = TOP_Y + ROWS * ROW_DY + 26;
+const DX = 24, CENTER_X = W / 2;
+
+function pegXY(row, idx) { return [CENTER_X + (idx - row / 2) * DX * 2, TOP_Y + row * ROW_DY]; }
+function slotX(slot) { return CENTER_X + (slot - ROWS / 2) * DX * 2; }
+function multStr(s) { return (multX100[s] / 100).toFixed(1) + "×"; }
+
+function drawBoard(ball) {
+  ctx.clearRect(0, 0, W, H);
+  ctx.fillStyle = "#8fa0c8";
+  for (let r = 0; r < ROWS; r++) {
+    for (let i = 0; i <= r; i++) {
+      const [x, y] = pegXY(r, i);
+      ctx.beginPath(); ctx.arc(x, y, 4, 0, Math.PI * 2); ctx.fill();
+    }
+  }
+  ctx.font = "bold 12px system-ui"; ctx.textAlign = "center";
+  for (let s = 0; s < SLOTS; s++) {
+    const x = slotX(s);
+    const hot = multX100[s] >= 300;
+    ctx.fillStyle = hot ? "rgba(255,179,64,.18)" : "rgba(96,165,250,.10)";
+    ctx.fillRect(x - DX + 2, SLOT_Y - 16, DX * 2 - 4, 34);
+    ctx.strokeStyle = "#2a3352"; ctx.strokeRect(x - DX + 2, SLOT_Y - 16, DX * 2 - 4, 34);
+    ctx.fillStyle = hot ? "#ffb340" : "#9aa5c4";
+    ctx.fillText(multStr(s), x, SLOT_Y + 5);
+  }
+  if (ball) {
+    ctx.beginPath(); ctx.fillStyle = "#ffb340";
+    ctx.arc(ball.x, ball.y, 8, 0, Math.PI * 2); ctx.fill();
+    ctx.strokeStyle = "rgba(0,0,0,.35)"; ctx.stroke();
+  }
+}
+drawBoard(null);
+
+// Bit jalur bola persis seperti kontrak: byte teratas dari
+// keccak256(abi.encode(word, roundId, player, clientSeed)).
+// Popcount-nya = slot; urutan bit (MSB dulu) hanya untuk animasi.
+function myPathBits(roundId, player, clientSeed, word = lastWord) {
+  const enc = ethers.AbiCoder.defaultAbiCoder().encode(
+    ["uint256", "uint256", "address", "bytes32"], [word, roundId, player, clientSeed]);
+  const topByte = parseInt(ethers.keccak256(enc).slice(2, 4), 16);
+  const bits = [];
+  for (let i = 7; i >= 0; i--) bits.push((topByte >> i) & 1);
+  return bits;
+}
+
+// Slot seorang pemain dari word on-chain (identik dengan _slotOf kontrak):
+// popcount 8-bit teratas dari keccak256(abi.encode(word, roundId, player, seed)).
+function slotOf(word, roundId, player, clientSeed) {
+  return myPathBits(roundId, player, clientSeed, word).reduce((s, b) => s + b, 0);
+}
+
+let animating = false;
+
+// Animasi inti: jatuhkan bola mengikuti urutan bit (kiri/kanan per baris).
+// Mengembalikan Promise yang selesai saat bola mendarat.
+function animateBits(bits) {
+  return new Promise(resolve => {
+    if (animating) { resolve(); return; }
+    const slot = bits.reduce((s, b) => s + b, 0);
+    const pts = [[CENTER_X, 26]];
+    let pos = 0;
+    for (let r = 0; r < ROWS; r++) {
+      pos += bits[r] ? 1 : -1;
+      pts.push([CENTER_X + (pos / 2) * DX * 2, TOP_Y + r * ROW_DY + ROW_DY / 2]);
+    }
+    pts.push([slotX(slot), SLOT_Y]);
+    animating = true;
+    const SEG_MS = 170;
+    let seg = 0, t = 0, last = performance.now();
+    function frame(now) {
+      const dt = now - last; last = now;
+      t += dt / SEG_MS;
+      while (t >= 1 && seg < pts.length - 2) { t -= 1; seg++; }
+      if (seg >= pts.length - 2 && t >= 1) {
+        const [x, y] = pts[pts.length - 1];
+        drawBoard({ x, y });
+        animating = false;
+        resolve();
+        return;
+      }
+      const [x0, y0] = pts[seg], [x1, y1] = pts[seg + 1];
+      drawBoard({
+        x: x0 + (x1 - x0) * t,
+        y: y0 + (y1 - y0) * t - Math.sin(t * Math.PI) * 7,
+      });
+      requestAnimationFrame(frame);
+    }
+    requestAnimationFrame(frame);
+  });
+}
+
+async function playBallAnimation(expectedSlot) {
+  if (animating || !account) return;
+  const en = await gameRead.entryOf(viewRoundId, account);
+  if (en.stake === 0n) return;
+  const bits = myPathBits(viewRoundId, account, en.clientSeed);
+  // slot harus sama dengan result() on-chain; animasi hanya visual.
+  cv.scrollIntoView({ behavior: "smooth", block: "center" });
+  animateBits(bits);
+}
+$("animBtn").onclick = () => playBallAnimation();
+
+// --- Init --------------------------------------------------------------------------
+$("gameLink").href = `${EXPLORER}/address/${GAME_ADDR}`;
+$("tokenLink").href = `${EXPLORER}/address/${TOKEN_ADDR}`;
+
+(async () => {
+  try {
+    const [t, m, mp] = await Promise.all([gameRead.stakeTiers(), gameRead.multipliersX100(), gameRead.MAX_PLAYERS()]);
+    tiers = [...t];
+    multX100 = [...m].map(Number);
+    maxPlayers = Number(mp);
+  } catch (e) {
+    tiers = [ethers.parseUnits("2000000", 18), ethers.parseUnits("5000000", 18), ethers.parseUnits("10000000", 18)];
+  }
+  renderTiers();
+  drawBoard(null);
+  await refreshAll();
+  setInterval(refreshAll, 6000);
+})();
+</script>
+</body>
+</html>

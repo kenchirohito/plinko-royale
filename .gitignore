@@ -1,0 +1,20 @@
+# Secrets — testnet wallet keys, never commit
+testnet/keys/
+
+# Foundry build artifacts
+contracts/out/
+contracts/cache/
+prepared-fix-m1/out/
+prepared-fix-m1/cache/
+
+# Python
+__pycache__/
+*.pyc
+
+# Runtime state / logs
+keeper-state.json
+*.log
+
+# Superseded working variant + audit snapshot bundle
+prepared-fix-m1/
+plinko-royale-source-bundle.txt

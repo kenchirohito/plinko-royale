@@ -1,0 +1,208 @@
+# Plinko Royale — Agent Guide (llms-plinko.txt)
+
+Plinko Royale is a PvP Plinko game for the AGC (Agentic Coin) ecosystem.
+Players stake fixed tiers into a shared pot each 5-minute round; one
+Chainlink VRF random word decides every player's Plinko slot; the pot is
+split by score (stake x slot multiplier). 0.3% of every pot is burned,
+0.3% goes to a fixed operational-fee address, 99.4% is paid to players.
+The contract has no owner, no admin, and no bankroll: players pay each
+other, so the game cannot go bankrupt and nobody can rig outcomes.
+
+This file is written for AI agents. Everything below can be done with
+plain contract calls — no website, no API keys, no registration. Humans
+and agents play under identical rules and payouts.
+
+=====================================================================
+ADDRESSES  (TESTNET — these change at mainnet launch; see "Mainnet" below)
+=====================================================================
+
+Chain:            BSC Testnet, chain ID 97
+Game contract:    0x8643ab8Fe68aBC315aC7D38b5518e6cc3644F0a7
+Stake token:      0x17356908F432eD7F2a4b378F19b5c869b872e21E  (MockAGC, test only)
+VRF wrapper:      0x471506e6ADED0b9811D05B8cAc8Db25eE839Ac94  (Chainlink VRF v2.5)
+Burn address:     0x000000000000000000000000000000000000dEaD
+RPC (example):    https://data-seed-prebsc-1-s1.bnbchain.org:8545
+Explorer:         https://testnet.bscscan.com
+
+=====================================================================
+GAME RULES (exact)
+=====================================================================
+
+- Rounds run on a fixed clock: round 0 opened at deployment, a new round
+  opens every 300 seconds. Nobody starts rounds; the current round id is
+  (block.timestamp - genesis) / 300.
+- Stake tiers (exact amounts only, 18 decimals):
+    2,000,000 AGC  = 2000000000000000000000000 wei
+    5,000,000 AGC  = 5000000000000000000000000 wei
+   10,000,000 AGC  = 10000000000000000000000000 wei
+- One entry per address per round. No raising, no re-entry.
+- Maximum 500 entries per round (MAX_PLAYERS). The 501st entry reverts
+  with "round full" and costs the caller nothing but gas — just enter
+  the next round. The cap exists because settle()/refund() process
+  every player in one transaction; 500 keeps that far below the block
+  gas limit (measured ~37.5k gas/player settle, ~32.2k refund).
+- The board has 8 peg rows and 9 slots (0-8). Slot multipliers (x100):
+    [1160, 300, 140, 70, 40, 70, 140, 300, 1160]   (edges 11.6x, center 0.4x)
+  Slot probability is C(8,k)/256; the multiplier table's expected value
+  is exactly 1.0, so the only house take is the transparent 0.6% below.
+- Settlement (integer math, identical to the reference verify.py):
+    pot        = sum of stakes
+    burn       = floor(pot * 30 / 10000)          (0.3% -> dead address)
+    fee        = floor(pot * 30 / 10000)          (0.3% -> fee recipient)
+    payoutPool = pot - burn - fee                 (99.4%)
+    score_i    = stake_i * MULT_X100[slot_i]
+    payout_i   = floor(payoutPool * score_i / sum(scores))
+    dust       = payoutPool - sum(payouts)        (< 1 wei-unit per player, stays in contract)
+  Conservation is exact: sum(payouts) + burn + fee + dust = pot.
+- Slot derivation (provably fair, recomputable by anyone):
+    hash_i     = keccak256(abi.encode(word, roundId, player_i, clientSeed_i))
+    pathBits_i = uint8(uint256(hash_i) >> 248)    (top 8 bits)
+    slot_i     = popcount(pathBits_i)             (0..8)
+  `word` is the round's single Chainlink VRF word, requested only after
+  entries close. Nobody knows it while staking. clientSeed is optional
+  player entropy (bytes32(0) if unused); it cannot bias the outcome.
+- Payouts and refunds are credited to an in-game balance. Withdraw any
+  time with withdraw(amount).
+- Refunds (full stake back, no burn, no fee) via refund(roundId) when:
+    * fewer than 2 players entered, or
+    * nobody called draw() within 1 hour of close, or
+    * the VRF word never arrived within 1 hour of the draw request.
+  Once a word has arrived, a round can only settle (never refund).
+
+=====================================================================
+CONTRACT INTERFACE (PlinkoRoyale)
+=====================================================================
+
+Constants (pure views):
+  ROUND_DURATION() -> 300
+  MAX_PLAYERS() -> 500            (entries per round cap)
+  DRAW_TIMEOUT() -> 3600          RANDOM_TIMEOUT() -> 3600
+  TIER_1() / TIER_2() / TIER_3()  -> stake tiers in wei
+  stakeTiers() -> uint256[3]
+  multipliersX100() -> uint16[9]
+  burnBps() -> 30                 feeBps() -> 30
+  deadAddress() -> 0x0000...dEaD
+
+Immutables (set at deploy, never changeable):
+  token()        -> stake token address
+  feeRecipient() -> operational-fee recipient
+  wrapper()      -> Chainlink VRF v2.5 wrapper
+  genesis()      -> deployment timestamp (round grid anchor)
+
+Reads:
+  currentRound() -> (uint256 id, uint64 opensAt, uint64 closesAt)
+  roundDetail(roundId) -> (uint8 phase, uint64 opensAt, uint64 closesAt,
+                           uint256 totalStaked, uint256 playerCount,
+                           uint256 requestId, uint256 burned,
+                           uint256 feePaid, uint256 dust)
+      phase: 0 Open, 1 AwaitingDraw, 2 AwaitingRandom, 3 Settled, 4 Refunded
+  randomWordOf(roundId) -> uint256        (0 until fulfilled)
+  wordReceivedOf(roundId) -> bool         (true once the VRF word is in;
+      gate settle() on this, not on randomWordOf != 0)
+  drawRequestedAtOf(roundId) -> uint256   (0 until drawn; the random-
+      timeout refund opens at this + RANDOM_TIMEOUT)
+  playersOf(roundId) -> address[]         (all entrants, entry order;
+      length <= MAX_PLAYERS; empty for rounds with no entries)
+  entryOf(roundId, player) -> (uint256 stake, bytes32 clientSeed, uint8 slot, uint256 payout)
+      slot/payout are 0 until the round is Settled; stake 0 = not entered.
+  result(roundId, player) -> (uint256 staked, uint256 payout, uint8 slot)
+      For a Refunded round payout stays 0 (stake went to balanceOf).
+  balanceOf(player) -> uint256            (withdrawable in-game balance)
+  stakedOf(player) -> uint256             (stake locked in non-final rounds)
+  drawFee(gasPriceWei) -> uint256         (BNB wei to send with draw())
+
+Writes:
+  enter(roundId, amount, clientSeed)
+      roundId must be the currently open round; amount must be a tier.
+      Pulls `amount` from your wallet via transferFrom — approve first.
+      Reverts if you already entered, the round is not open, the amount
+      is not a tier, or the token transfer delivers a different amount.
+  draw(roundId) payable
+      After close, >= 2 players. Send at least drawFee(currentGasPrice)
+      in BNB; excess is refunded in the same tx (caller must be able to
+      receive BNB — use an EOA or a contract with receive()).
+  settle(roundId)
+      After the word arrives (wordReceivedOf(roundId) == true /
+      RandomFulfilled event). Permissionless; credits all payouts,
+      burns 0.3%, pays 0.3% fee.
+  refund(roundId)
+      Permissionless once a refund condition holds (see rules).
+  withdraw(amount)
+      Moves in-game balance to your wallet.
+
+Events:
+  Entered(uint256 indexed roundId, address indexed player, uint256 amount, bytes32 clientSeed)
+  DrawRequested(uint256 indexed roundId, uint256 requestId)
+  RandomFulfilled(uint256 indexed roundId, uint256 word)
+  Settled(uint256 indexed roundId, uint256 pot, uint256 burned, uint256 feePaid, uint256 dust)
+  Refunded(uint256 indexed roundId, uint256 pot)
+  Withdrawn(address indexed player, uint256 amount)
+
+Note: playersOf(roundId) lists every entrant with a plain eth_call —
+no event scanning needed. (Entered events remain available for
+indexers that prefer logs.)
+
+=====================================================================
+HOW TO PLAY (agent checklist)
+=====================================================================
+
+1. Read currentRound(). Note id, opensAt, closesAt. Enter only while
+   block.timestamp < closesAt (leave a safety margin near the boundary;
+   entries at the exact closing second belong to the next round).
+2. Check your token balance and allowance:
+     token.balanceOf(you), token.allowance(you, GAME)
+   If allowance < tier, call token.approve(GAME, tier).
+3. Call enter(roundId, tier, clientSeed). clientSeed may be bytes32(0)
+   or your own random bytes32 — it does not affect fairness.
+4. Optionally verify your entry: entryOf(roundId, you).stake == tier.
+5. After closesAt, anyone may draw. Quote drawFee(gasPriceWei) and call
+   draw(roundId) with value >= quote (a small buffer is fine; excess is
+   refunded). A keeper usually does this within seconds — you do not
+   have to, but drawing yourself guarantees the round proceeds.
+6. Wait for RandomFulfilled(roundId, word) or poll wordReceivedOf(roundId)
+   until true (typically under a minute). Read the word itself from
+   randomWordOf(roundId) for verification.
+7. Call settle(roundId) (anyone may). Then read result(roundId, you).
+8. Verify your payout yourself (optional but recommended):
+   recompute your slot from (word, roundId, you, your clientSeed) and
+   re-run the settlement formula over all entries (playersOf(roundId)
+   + entryOf for each).
+9. withdraw(balanceOf(you)) whenever you want your winnings in-wallet.
+
+Failure handling:
+- enter() reverts "round not open": the round flipped; re-read
+  currentRound() and enter the new one.
+- enter() reverts "round full": 500 entries already in; wait for the
+  next round (check roundDetail().playerCount against MAX_PLAYERS()
+  before entering to avoid the wasted call).
+- enter() reverts "already entered": one entry per address per round.
+- draw() reverts "too few players, use refund": call refund() instead.
+- No word after 1 hour from draw: call refund() for a full stake back
+  (exact moment: drawRequestedAtOf(roundId) + RANDOM_TIMEOUT()).
+- Nobody drew within 1 hour of close: call refund().
+
+=====================================================================
+MAINNET (what changes at launch)
+=====================================================================
+
+- Chain becomes BSC mainnet (chain ID 56); game and token addresses
+  will be published in the mainnet version of this file. The stake
+  token will be the real AGC (0x63dea5aCdbE1F27c968907D08610A5f0A0284bA6).
+- The VRF wrapper address will be re-verified against Chainlink's
+  supported-networks list at deploy time.
+- Rules, tiers, multipliers, fees, timeouts, and this interface are
+  hard-coded constants/immutables and do not change between testnet
+  and mainnet deployments of the same contract code.
+- Testnet MockAGC has an open mint() faucet; mainnet AGC does not.
+  Do not carry testnet assumptions (free tokens, faucet) to mainnet.
+
+=====================================================================
+TRUST SUMMARY
+=====================================================================
+
+- No owner, no admin, no pause, no setters, no upgrade path.
+- Randomness: Chainlink VRF v2.5; proof verified by Chainlink before
+  delivery; entries close before the word exists.
+- Every slot and payout is recomputable from public data.
+- The contract can only hold: in-game balances + stakes in unfinished
+  rounds + flooring dust. No function moves tokens anywhere else.
