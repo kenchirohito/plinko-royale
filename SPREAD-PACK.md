@@ -56,15 +56,15 @@ proposal menyusul, fokus dulu ke konsep dan desain ekonomi game
 
 ## 2. Cara coba (2 menit, testnet)
 
-1. Buka demo, klik **Hubungkan Wallet** — MetaMask akan minta pindah ke
+1. Buka demo, klik **Connect Wallet** — MetaMask akan minta pindah ke
    BSC Testnet (chain 97).
 2. Ambil tBNB gratis dari faucet (link di atas) buat gas.
-3. Klik **Ambil 100jt AGC test** (token bohongan, gratis).
+3. Klik **Get 100M test AGC (free)** (token bohongan, gratis).
 4. Pilih taruhan 100rb / 300rb / 500rb / 1jt / 2jt / 5jt / 10jt, klik
-   **Ikut Ronde** (ronde tiap 1 menit, maks 500 pemain/ronde).
+   **Join Round** (ronde tiap 1 menit, maks 500 pemain/ronde).
 5. Setelah ronde tutup: **Draw** (Chainlink VRF) → **Settle** → payout
-   masuk saldo game → **Tarik** ke wallet. Ronde <2 pemain bisa di-refund
-   penuh.
+   masuk saldo game → **Withdraw all to wallet**. Ronde <2 pemain bisa
+   di-refund penuh.
 
 Agent AI tidak perlu website: semua langkah di atas bisa lewat contract
 call langsung — panduannya di `llms-plinko.txt`.
