@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html lang="id">
+<html lang="en">
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
@@ -97,17 +97,17 @@
 <body>
 <div class="wrap">
   <div class="testnet-banner">
-    <b>TESTNET — uang mainan.</b> Ini BSC Testnet (chain 97). Token AGC di sini adalah
-    MockAGC untuk demo, <b>bukan</b> AGC asli, dan tidak bernilai. Jangan kirim dana asli ke alamat mana pun di halaman ini.
+    <b>TESTNET — play money.</b> This is BSC Testnet (chain 97). The AGC token here is
+    MockAGC for demo purposes, <b>not</b> real AGC, and has no value. Do not send real funds to any address on this page.
   </div>
 
   <header class="top">
     <div>
       <h1>Plinko <span class="accent">Royale</span></h1>
-      <p class="sub">PvP Plinko untuk ekosistem AGC — demo testnet, terhubung langsung ke smart contract.</p>
+      <p class="sub">PvP Plinko for the AGC ecosystem — testnet demo, connected directly to the smart contract.</p>
     </div>
     <div class="wallet-box">
-      <button id="connectBtn" class="primary">Hubungkan Wallet</button>
+      <button id="connectBtn" class="primary">Connect Wallet</button>
       <div id="walletInfo" style="margin-top:6px"></div>
     </div>
   </header>
@@ -117,87 +117,87 @@
 
     <div class="side">
       <div class="card">
-        <h2>Ronde</h2>
+        <h2>Round</h2>
         <div class="row round-nav">
-          <button id="prevRoundBtn" title="Ronde sebelumnya">◀</button>
+          <button id="prevRoundBtn" title="Previous round">◀</button>
           <input type="number" id="roundInput" min="0" step="1">
-          <button id="nextRoundBtn" title="Ronde berikutnya">▶</button>
-          <button id="liveRoundBtn">Ronde aktif</button>
+          <button id="nextRoundBtn" title="Next round">▶</button>
+          <button id="liveRoundBtn">Live round</button>
           <span class="phase-badge" id="phaseBadge">…</span>
         </div>
-        <div class="kv" id="roundInfo" style="margin-top:8px">Memuat data on-chain…</div>
+        <div class="kv" id="roundInfo" style="margin-top:8px">Loading on-chain data…</div>
         <div class="countdown" id="countdown"></div>
-        <div class="muted" style="margin-top:6px">Pemain yang sudah ikut:</div>
+        <div class="muted" style="margin-top:6px">Players in this round:</div>
         <div class="chips" id="playerChips"><span class="muted">—</span></div>
       </div>
 
       <div class="card">
-        <h2>Ikut ronde</h2>
+        <h2>Join round</h2>
         <div class="kv">
-          Saldo AGC test di wallet: <b id="tokenBal">—</b>
-          <button id="mintBtn" style="margin-left:6px" disabled>Ambil 100jt AGC test (gratis)</button>
+          Test AGC balance in wallet: <b id="tokenBal">—</b>
+          <button id="mintBtn" style="margin-left:6px" disabled>Get 100M test AGC (free)</button>
         </div>
-        <label class="small">Pilih taruhan (tier tetap)</label>
+        <label class="small">Choose your stake (fixed tiers)</label>
         <div class="tiers" id="tiers"></div>
-        <label class="small">Client seed (opsional — entropi tambahan dari kamu; kosongkan untuk acak)</label>
+        <label class="small">Client seed (optional — extra entropy from you; leave empty for random)</label>
         <div class="row">
-          <input type="text" id="seedInput" placeholder="acak otomatis" style="flex:1">
-          <button id="seedBtn" title="Buat seed acak baru">🎲</button>
+          <input type="text" id="seedInput" placeholder="auto-random" style="flex:1">
+          <button id="seedBtn" title="Generate a new random seed">🎲</button>
         </div>
-        <button id="enterBtn" class="primary big" disabled>Ikut Ronde</button>
+        <button id="enterBtn" class="primary big" disabled>Join Round</button>
         <div class="status" id="enterStatus"></div>
       </div>
 
       <div class="card">
-        <h2>Aksi ronde (siapa pun boleh)</h2>
+        <h2>Round actions (anyone can call)</h2>
         <div class="actions">
-          <button id="drawBtn" disabled>Draw (minta angka acak VRF)</button>
-          <button id="settleBtn" disabled>Settle (bagi pot)</button>
-          <button id="refundBtn" disabled>Refund (kembalikan taruhan)</button>
+          <button id="drawBtn" disabled>Draw (request VRF random number)</button>
+          <button id="settleBtn" disabled>Settle (split the pot)</button>
+          <button id="refundBtn" disabled>Refund (return stakes)</button>
         </div>
         <div class="muted" id="actionHint" style="margin-top:8px"></div>
         <div class="status" id="actionStatus"></div>
       </div>
 
       <div class="card" id="resultCard" style="display:none">
-        <h2>Hasil ronde</h2>
+        <h2>Round results</h2>
         <table>
           <thead><tr>
-            <th>Pemain</th><th>Taruhan</th><th>Slot</th><th>Mult</th><th>Payout</th><th>Net</th>
+            <th>Player</th><th>Stake</th><th>Slot</th><th>Mult</th><th>Payout</th><th>Net</th>
           </tr></thead>
           <tbody id="resultBody"></tbody>
         </table>
         <div class="summary" id="summary" style="margin-top:10px"></div>
-        <button id="animBtn" style="margin-top:10px; display:none">▶ Putar animasi bola saya</button>
+        <button id="animBtn" style="margin-top:10px; display:none">▶ Replay my ball animation</button>
       </div>
 
       <div class="card">
-        <h2>Saldo game</h2>
+        <h2>Game balance</h2>
         <div class="kv">
-          Bisa ditarik: <b id="gameBal">—</b> AGC<br>
-          Terkunci di ronde berjalan: <b id="stakedBal">—</b> AGC
+          Withdrawable: <b id="gameBal">—</b> AGC<br>
+          Locked in open rounds: <b id="stakedBal">—</b> AGC
         </div>
-        <button id="withdrawBtn" class="primary" style="margin-top:8px" disabled>Tarik semua ke wallet</button>
+        <button id="withdrawBtn" class="primary" style="margin-top:8px" disabled>Withdraw all to wallet</button>
         <div class="status" id="withdrawStatus"></div>
       </div>
 
       <div class="card how">
-        <h2 style="color:var(--text)">Cara main</h2>
-        <p>Ronde berjalan tiap <b>1 menit</b>. Pilih taruhan tetap (<b>100rb / 300rb / 500rb / 1jt / 2jt / 5jt / 10jt AGC</b>),
-        satu entri per alamat per ronde. Setelah ronde tutup, siapa pun bisa menekan <b>Draw</b> —
-        Chainlink VRF mengeluarkan satu angka acak yang menentukan slot semua pemain
-        (bola jatuh lewat 8 baris pasak ke 9 slot; pengali tepi 11,6×, tengah 0,4×).</p>
-        <p><b>Settle</b> membagi pot: <b>0,3% dibakar</b>, <b>0,3% fee operasional</b>,
-        99,4% dibagi ke pemain sebanding skor (taruhan × pengali). Payout masuk ke saldo game,
-        tarik kapan saja. Ronde dengan &lt;2 pemain, atau yang tidak di-draw / tidak dapat angka acak
-        dalam 1 jam, bisa di-<b>refund</b> penuh.</p>
-        <p>Kontrak game:
+        <h2 style="color:var(--text)">How to play</h2>
+        <p>Rounds run every <b>1 minute</b>. Pick a fixed stake (<b>100K / 300K / 500K / 1M / 2M / 5M / 10M AGC</b>),
+        one entry per address per round. After the round closes, anyone can press <b>Draw</b> —
+        Chainlink VRF produces one random number that decides every player's slot
+        (the ball drops through 8 rows of pegs into 9 slots; edge multiplier 11.6×, center 0.4×).</p>
+        <p><b>Settle</b> splits the pot: <b>0.3% burned</b>, <b>0.3% operational fee</b>,
+        99.4% paid to players in proportion to score (stake × multiplier). Payouts go to your game balance —
+        withdraw anytime. Rounds with &lt;2 players, or that are not drawn / get no random number
+        within 1 hour, can be fully <b>refunded</b>.</p>
+        <p>Game contract:
           <a id="gameLink" href="#" target="_blank" rel="noopener">PlinkoRoyale</a> ·
-          Token test:
+          Test token:
           <a id="tokenLink" href="#" target="_blank" rel="noopener">MockAGC</a>
           (testnet BscScan)</p>
-        <p class="muted">Butuh tBNB untuk gas: ambil gratis di
-          <a href="https://www.bnbchain.org/en/testnet-faucet" target="_blank" rel="noopener">faucet BNB Chain testnet</a>.</p>
+        <p class="muted">Need tBNB for gas? Get it free at the
+          <a href="https://www.bnbchain.org/en/testnet-faucet" target="_blank" rel="noopener">BNB Chain testnet faucet</a>.</p>
       </div>
     </div>
   </div>
@@ -207,12 +207,12 @@
 <script>
 "use strict";
 /* =====================================================================
-   Plinko Royale — frontend testnet (satu file, ethers v6).
-   Halaman ini hanya membaca/menulis kontrak testnet yang sudah terdeploy.
-   Tidak ada private key di sini; semua tanda tangan lewat wallet pengguna.
+   Plinko Royale — testnet frontend (single file, ethers v6).
+   This page only reads/writes the already-deployed testnet contract.
+   No private keys here; all signing happens through the user's wallet.
    ===================================================================== */
 
-// --- Konfigurasi -------------------------------------------------------------
+// --- Configuration -------------------------------------------------------------
 const CHAIN_ID = 97;                                   // BSC testnet
 const CHAIN_ID_HEX = "0x61";
 const RPC_URLS = [
@@ -220,13 +220,13 @@ const RPC_URLS = [
   "https://data-seed-prebsc-1-s1.bnbchain.org:8545",
   "https://data-seed-prebsc-2-s1.bnbchain.org:8545",
 ];
-const RPC_URL = RPC_URLS[0]; // untuk wallet add-chain; baca data pakai rotasi di bawah
+const RPC_URL = RPC_URLS[0]; // for wallet add-chain; reads use the rotation below
 const EXPLORER = "https://testnet.bscscan.com";
-const GAME_ADDR  = "0x5133d3a7b0AAb6dFb3c40b824741FA4A776Bc3EF"; // PlinkoRoyale (redeploy 2026-11-26, ronde 1 menit + 7 tier stake)
+const GAME_ADDR  = "0x5133d3a7b0AAb6dFb3c40b824741FA4A776Bc3EF"; // PlinkoRoyale (redeployed 2026-11-26, 1-minute rounds + 7 stake tiers)
 const TOKEN_ADDR = "0x17356908F432eD7F2a4b378F19b5c869b872e21E"; // MockAGC (testnet)
-const MULTICALL3 = "0xcA11bde05977b3631167028862bE2a173976CA11"; // batch eth_call (audit MEDIUM-1)
-const DEPLOY_BLOCK = 144976141;                        // blok deploy PlinkoRoyale (referensi saja; daftar pemain kini via playersOf)
-const MINT_AMOUNT = ethers.parseUnits("100000000", 18); // 100jt AGC test per klik
+const MULTICALL3 = "0xcA11bde05977b3631167028862bE2a173976CA11"; // batched eth_call (audit MEDIUM-1)
+const DEPLOY_BLOCK = 144976141;                        // PlinkoRoyale deploy block (reference only; player list now via playersOf)
+const MINT_AMOUNT = ethers.parseUnits("100000000", 18); // 100M test AGC per click
 
 const GAME_ABI = [
   "function currentRound() view returns (uint256 id, uint64 opensAt, uint64 closesAt)",
@@ -274,9 +274,9 @@ let gameRead  = new ethers.Contract(GAME_ADDR, GAME_ABI, readProvider);
 let tokenRead = new ethers.Contract(TOKEN_ADDR, TOKEN_ABI, readProvider);
 let multicall = new ethers.Contract(MULTICALL3, MULTICALL3_ABI, readProvider);
 
-// RPC publik kadang gagal sesaat (rate-limit / jaringan HP): ganti endpoint
-// dan bangun ulang kontrak baca. Error hanya ditampilkan setelah beberapa
-// kali gagal berturut-turut, supaya satu refresh yang gagal tidak menakuti.
+// Public RPCs sometimes fail briefly (rate-limit / phone network): rotate the
+// endpoint and rebuild the read contracts. Errors are only shown after several
+// consecutive failures, so one failed refresh does not scare the user.
 let readFailStreak = 0;
 function rotateRpc() {
   rpcIdx = (rpcIdx + 1) % RPC_URLS.length;
@@ -285,41 +285,41 @@ function rotateRpc() {
   gameRead  = new ethers.Contract(GAME_ADDR, GAME_ABI, readProvider);
   tokenRead = new ethers.Contract(TOKEN_ADDR, TOKEN_ABI, readProvider);
   multicall = new ethers.Contract(MULTICALL3, MULTICALL3_ABI, readProvider);
-  if (old && old.destroy) old.destroy(); // hentikan timer polling provider lama (audit INFO-1)
+  if (old && old.destroy) old.destroy(); // stop the old provider polling timers (audit INFO-1)
 }
 
-let signer = null, account = null;         // wallet terhubung (null = mode baca)
-let game = null, token = null;             // kontrak dengan signer
-let tiers = [];                            // 7 tier (100rb..10jt) dalam wei (BigInt), dibaca dari kontrak
-let maxPlayers = 500;                      // batas pemain per ronde (dibaca dari kontrak saat init)
+let signer = null, account = null;         // connected wallet (null = read-only mode)
+let game = null, token = null;             // contracts with signer
+let tiers = [];                            // 7 tiers (100K..10M) in wei (BigInt), read from the contract
+let maxPlayers = 500;                      // max players per round (read from the contract at init)
 let multX100 = [1160,300,140,70,40,70,140,300,1160];
 let selectedTier = 0;
-let liveRoundId = null;                    // ronde yang sedang dibuka (dari chain)
-let viewRoundId = null;                    // ronde yang sedang ditampilkan
-let followLive = true;                     // ikut ronde aktif secara otomatis
-let chainTimeOffset = 0;                   // selisih jam chain vs jam lokal (detik)
-let lastDetail = null;                     // roundDetail terakhir untuk viewRoundId
+let liveRoundId = null;                    // currently open round (from chain)
+let viewRoundId = null;                    // round being displayed
+let followLive = true;                     // follow the live round automatically
+let chainTimeOffset = 0;                   // chain clock vs local clock offset (seconds)
+let lastDetail = null;                     // latest roundDetail for viewRoundId
 let lastWord = 0n;
-let lastWordReceived = false;              // wordReceivedOf(viewRoundId) — gate settle (audit LOW-5)
-let lastDrawRequestedAt = 0;               // drawRequestedAtOf(viewRoundId) — gate refund (audit LOW-6)
-let playersCache = new Map();              // roundId -> {list} (dari playersOf)
+let lastWordReceived = false;              // wordReceivedOf(viewRoundId) — settle gate (audit LOW-5)
+let lastDrawRequestedAt = 0;               // drawRequestedAtOf(viewRoundId) — refund gate (audit LOW-6)
+let playersCache = new Map();              // roundId -> {list} (from playersOf)
 let myEntry = null;                        // entryOf(viewRound, account)
 let tokenBalance = 0n, gameBalance = 0n;
-let busy = false;                          // sedang menunggu tx
-let animPlayedFor = new Set();             // ronde yang animasinya sudah diputar
-let renderResultsSeq = 0;                  // penjaga anti-tumpang-tindih renderResults
+let busy = false;                          // waiting for a tx
+let animPlayedFor = new Set();             // rounds whose animation already played
+let renderResultsSeq = 0;                  // anti-overlap guard for renderResults
 
 const $ = id => document.getElementById(id);
-const PHASE_NAMES = ["Pendaftaran dibuka", "Menunggu draw", "Menunggu angka acak", "Selesai", "Di-refund"];
+const PHASE_NAMES = ["Open for entries", "Awaiting draw", "Awaiting random number", "Settled", "Refunded"];
 
 // --- Util --------------------------------------------------------------------
 function fmtAGC(wei) {
-  // Tampilkan dalam AGC utuh, maks 2 desimal (nilai persis ada di title).
+  // Display in whole AGC, max 2 decimals (exact value in title).
   const s = ethers.formatUnits(wei, 18);
   const [int, frac = ""] = s.split(".");
-  const intFmt = BigInt(int).toLocaleString("id-ID");
+  const intFmt = BigInt(int).toLocaleString("en-US");
   const f = frac.slice(0, 2).replace(/0+$/, "");
-  return f ? `${intFmt},${f}` : intFmt;
+  return f ? `${intFmt}.${f}` : intFmt;
 }
 function fmtSigned(wei) { return (wei > 0n ? "+" : "") + fmtAGC(wei); }
 function shortAddr(a) { return a.slice(0, 6) + "…" + a.slice(-4); }
@@ -331,39 +331,39 @@ function setStatus(el, msg, kind = "") {
   el.innerHTML = msg;
 }
 const REVERT_ID = {
-  "round full": "Ronde sudah penuh (maks 500 pemain) — ikut ronde berikutnya ya, 1 menit lagi.",
-  "already entered": "Kamu sudah ikut ronde ini (satu entri per alamat).",
-  "round not open": "Ronde ini tidak sedang dibuka untuk pendaftaran.",
-  "amount not a stake tier": "Jumlah taruhan harus salah satu tier (100rb/300rb/500rb/1jt/2jt/5jt/10jt).",
-  "stake transfer failed": "Transfer taruhan gagal — cek saldo & allowance.",
-  "stake transfer taxed": "Token memotong transfer (tax) — entri ditolak kontrak.",
-  "round not awaiting draw": "Ronde ini tidak dalam status menunggu draw.",
-  "round still open": "Ronde masih dibuka — tunggu sampai tutup.",
-  "too few players, use refund": "Pemain kurang dari 2 — gunakan Refund.",
-  "insufficient VRF fee": "Fee VRF yang dikirim kurang.",
-  "fee refund failed": "Refund kelebihan fee VRF gagal.",
-  "round not awaiting random": "Ronde ini tidak sedang menunggu angka acak.",
-  "word not received yet": "Angka acak belum keluar — tunggu sebentar.",
-  "word received, settle instead": "Angka acak sudah keluar — gunakan Settle, bukan Refund.",
-  "refund not available yet": "Refund belum tersedia (tunggu batas 1 jam).",
-  "round already final": "Ronde sudah selesai (final).",
-  "insufficient balance": "Saldo game tidak cukup.",
-  "amount is zero": "Jumlah nol.",
-  "withdraw transfer failed": "Transfer withdraw gagal.",
-  "allowance too low": "Allowance token kurang — approve dulu.",
-  "balance too low": "Saldo token tidak cukup.",
+  "round full": "Round is full (max 500 players) — join the next one, in 1 minute.",
+  "already entered": "You already joined this round (one entry per address).",
+  "round not open": "This round is not open for entries.",
+  "amount not a stake tier": "Stake must be one of the tiers (100K/300K/500K/1M/2M/5M/10M).",
+  "stake transfer failed": "Stake transfer failed — check balance & allowance.",
+  "stake transfer taxed": "Token taxes transfers — entry rejected by the contract.",
+  "round not awaiting draw": "This round is not awaiting draw.",
+  "round still open": "Round still open — wait until it closes.",
+  "too few players, use refund": "Fewer than 2 players — use Refund.",
+  "insufficient VRF fee": "VRF fee sent is too low.",
+  "fee refund failed": "VRF fee overpayment refund failed.",
+  "round not awaiting random": "This round is not awaiting a random number.",
+  "word not received yet": "Random number not out yet — wait a moment.",
+  "word received, settle instead": "Random number already out — use Settle, not Refund.",
+  "refund not available yet": "Refund not available yet (wait for the 1-hour limit).",
+  "round already final": "Round already final.",
+  "insufficient balance": "Insufficient game balance.",
+  "amount is zero": "Amount is zero.",
+  "withdraw transfer failed": "Withdraw transfer failed.",
+  "allowance too low": "Token allowance too low — approve first.",
+  "balance too low": "Insufficient token balance.",
 };
 function escHtml(s) {
   return String(s).replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;")
     .replace(/"/g, "&quot;").replace(/'/g, "&#39;");
 }
 function friendlyError(e) {
-  if (e && (e.code === "ACTION_REJECTED" || e.code === 4001)) return "Transaksi dibatalkan di wallet.";
+  if (e && (e.code === "ACTION_REJECTED" || e.code === 4001)) return "Transaction cancelled in wallet.";
   const raw = (e && (e.reason || e.shortMessage || e.message)) || String(e);
   for (const k in REVERT_ID) if (raw.includes(k)) return REVERT_ID[k];
-  if (/insufficient funds/i.test(raw)) return "tBNB untuk gas tidak cukup — ambil dari faucet testnet.";
-  if (/network|chain/i.test(raw)) return "Jaringan salah — pindah ke BSC Testnet (chain 97).";
-  // Pesan mentah dari RPC/wallet di-escape sebelum masuk innerHTML (audit LOW-4).
+  if (/insufficient funds/i.test(raw)) return "Not enough tBNB for gas — get some from the testnet faucet.";
+  if (/network|chain/i.test(raw)) return "Wrong network — switch to BSC Testnet (chain 97).";
+  // Raw RPC/wallet messages are escaped before entering innerHTML (audit LOW-4).
   return escHtml(raw.length > 220 ? raw.slice(0, 220) + "…" : raw);
 }
 // --- Wallet ------------------------------------------------------------------
@@ -377,7 +377,7 @@ async function ensureChain() {
     });
     return true;
   } catch (e) {
-    if (e.code === 4902) { // chain belum dikenal wallet -> tambahkan
+    if (e.code === 4902) { // chain unknown to wallet -> add it
       await window.ethereum.request({
         method: "wallet_addEthereumChain",
         params: [{
@@ -397,7 +397,7 @@ async function ensureChain() {
 async function connect() {
   const btn = $("connectBtn");
   if (!window.ethereum) {
-    setStatus($("enterStatus"), "Wallet tidak terdeteksi. Pasang MetaMask (atau wallet EVM lain), lalu muat ulang halaman ini.", "err");
+    setStatus($("enterStatus"), "No wallet detected. Install MetaMask (or another EVM wallet), then reload this page.", "err");
     return;
   }
   try {
@@ -408,7 +408,7 @@ async function connect() {
     account = await signer.getAddress();
     game = new ethers.Contract(GAME_ADDR, GAME_ABI, signer);
     token = new ethers.Contract(TOKEN_ADDR, TOKEN_ABI, signer);
-    btn.textContent = "Wallet terhubung";
+    btn.textContent = "Wallet connected";
     await refreshAll();
   } catch (e) {
     setStatus($("enterStatus"), friendlyError(e), "err");
@@ -423,13 +423,13 @@ if (window.ethereum) {
   window.ethereum.on("chainChanged", () => location.reload());
 }
 
-// --- Baca data on-chain --------------------------------------------------------
+// --- On-chain reads --------------------------------------------------------
 async function fetchPlayers(roundId) {
-  // Daftar pemain dari view playersOf() (audit L-6) + entryOf() per pemain
-  // untuk jumlah taruhan & clientSeed. entryOf dibaca lewat Multicall3
-  // dalam SATU eth_call (audit MEDIUM-1: tanpa ini, ronde 500 pemain =
-  // 500 request paralel tiap refresh dan RPC publik kena rate-limit).
-  // Fallback ke panggilan paralel biasa bila Multicall3 gagal.
+  // Player list from the playersOf() view (audit L-6) + entryOf() per player
+  // for stake amount & clientSeed. entryOf is read via Multicall3 in ONE
+  // eth_call (audit MEDIUM-1: without this, a 500-player round = 500 parallel
+  // requests per refresh and public RPCs get rate-limited).
+  // Falls back to plain parallel calls if Multicall3 fails.
   const addrs = await gameRead.playersOf(roundId);
   let list;
   try {
@@ -471,8 +471,8 @@ async function refreshAll() {
       burned: d.burned, feePaid: d.feePaid, dust: d.dust,
     };
     lastWord = lastDetail.phase >= 2 ? await gameRead.randomWordOf(viewRoundId) : 0n;
-    // Gate settle/refund yang persis (audit LOW-5/LOW-6): pakai flag
-    // wordReceivedOf (bukan word != 0) dan timestamp drawRequestedAtOf.
+    // Exact settle/refund gates (audit LOW-5/LOW-6): use the wordReceivedOf
+    // flag (not word != 0) and the drawRequestedAtOf timestamp.
     if (lastDetail.phase >= 2) {
       const [wr, dra] = await Promise.all([
         gameRead.wordReceivedOf(viewRoundId),
@@ -485,7 +485,7 @@ async function refreshAll() {
       lastDrawRequestedAt = 0;
     }
 
-    // Pemain: dari view playersOf (ronde final tidak berubah lagi)
+    // Players: from the playersOf view (final rounds never change again)
     if (!playersCache.has(viewRoundId) || lastDetail.phase < 3) {
       await fetchPlayers(viewRoundId);
     }
@@ -511,7 +511,7 @@ async function refreshAll() {
     readFailStreak++;
     rotateRpc();
     if (readFailStreak >= 3) {
-      setStatus($("enterStatus"), "Gagal membaca data chain: " + friendlyError(e) + " (mencoba RPC lain…)", "err");
+      setStatus($("enterStatus"), "Failed to read chain data: " + friendlyError(e) + " (trying another RPC…)", "err");
     }
   }
 }
@@ -520,52 +520,52 @@ async function refreshAll() {
 function render() {
   const d = lastDetail;
   if (!d) return;
-  if (d.phase < 3 && !animating) drawBoard(null); // papan bersih sebelum hasil asli keluar
+  if (d.phase < 3 && !animating) drawBoard(null); // clean board before the real result is out
   const phase = d.phase;
   const wordArrived = lastWordReceived;
 
   let badge = PHASE_NAMES[phase];
-  if (phase === 2 && wordArrived) badge = "Siap settle";
-  if (viewRoundId > liveRoundId) badge = "Belum dibuka";
+  if (phase === 2 && wordArrived) badge = "Ready to settle";
+  if (viewRoundId > liveRoundId) badge = "Not opened yet";
   $("phaseBadge").textContent = badge;
 
-  const openTime = new Date(d.opensAt * 1000).toLocaleTimeString("id-ID");
-  const closeTime = new Date(d.closesAt * 1000).toLocaleTimeString("id-ID");
+  const openTime = new Date(d.opensAt * 1000).toLocaleTimeString("en-US");
+  const closeTime = new Date(d.closesAt * 1000).toLocaleTimeString("en-US");
   $("roundInfo").innerHTML =
-    `Ronde <b>#${viewRoundId}</b>${viewRoundId === liveRoundId ? " (aktif)" : ""} · ${openTime} – ${closeTime}<br>` +
-    `Pot: <b>${fmtAGC(d.totalStaked)} AGC</b> · Pemain: <b>${d.playerCount}/${maxPlayers}</b>`;
+    `Round <b>#${viewRoundId}</b>${viewRoundId === liveRoundId ? " (live)" : ""} · ${openTime} – ${closeTime}<br>` +
+    `Pot: <b>${fmtAGC(d.totalStaked)} AGC</b> · Players: <b>${d.playerCount}/${maxPlayers}</b>`;
 
-  // Chip pemain
+  // Player chips
   const players = (playersCache.get(viewRoundId) || { list: [] }).list;
   $("playerChips").innerHTML = players.length
     ? players.map(p =>
         `<span class="chip${account && p.player.toLowerCase() === account.toLowerCase() ? " me" : ""}" title="${p.player}">${shortAddr(p.player)} · ${fmtAGC(p.amount)}</span>`
       ).join("")
-    : `<span class="muted">belum ada</span>`;
+    : `<span class="muted">none yet</span>`;
 
-  // Tier + saldo token
-  $("tokenBal").textContent = account ? fmtAGC(tokenBalance) + " AGC" : "— (hubungkan wallet)";
+  // Tiers + token balance
+  $("tokenBal").textContent = account ? fmtAGC(tokenBalance) + " AGC" : "— (connect wallet)";
   renderTiers();
 
-  // Tombol ikut ronde
+  // Join-round button
   const enterBtn = $("enterBtn");
   const roundFull = d.playerCount >= maxPlayers;
   const canEnter = !!account && !busy && viewRoundId === liveRoundId && phase === 0 && !myEntry && !roundFull;
   enterBtn.disabled = !canEnter;
-  if (!account) enterBtn.textContent = "Hubungkan wallet dulu";
-  else if (myEntry) enterBtn.textContent = `Sudah ikut (${fmtAGC(myEntry.stake)} AGC)`;
-  else if (viewRoundId !== liveRoundId) enterBtn.textContent = "Hanya bisa ikut ronde aktif";
-  else if (phase !== 0) enterBtn.textContent = "Pendaftaran sudah tutup";
-  else if (roundFull) enterBtn.textContent = `Ronde penuh (${maxPlayers} pemain)`;
-  else enterBtn.textContent = "Ikut Ronde";
+  if (!account) enterBtn.textContent = "Connect your wallet first";
+  else if (myEntry) enterBtn.textContent = `Already in (${fmtAGC(myEntry.stake)} AGC)`;
+  else if (viewRoundId !== liveRoundId) enterBtn.textContent = "You can only join the live round";
+  else if (phase !== 0) enterBtn.textContent = "Entries are closed";
+  else if (roundFull) enterBtn.textContent = `Round full (${maxPlayers} players)`;
+  else enterBtn.textContent = "Join Round";
 
-  // Tombol aksi ronde
+  // Round action buttons
   $("drawBtn").disabled   = !account || busy || phase !== 1 || d.playerCount < 2;
   $("settleBtn").disabled = !account || busy || phase !== 2 || !wordArrived;
-  // Refund: aktif hanya bila kondisinya persis terpenuhi (audit LOW-6),
-  // supaya klik tidak membuang gas untuk tx yang pasti revert.
-  // Phase 1: pemain < 2, atau lewat closesAt + DRAW_TIMEOUT (1 jam).
-  // Phase 2: word belum datang DAN lewat drawRequestedAt + RANDOM_TIMEOUT.
+  // Refund: enabled only when its condition is exactly met (audit LOW-6),
+  // so a click never wastes gas on a tx that would surely revert.
+  // Phase 1: players < 2, or past closesAt + DRAW_TIMEOUT (1 hour).
+  // Phase 2: word not arrived AND past drawRequestedAt + RANDOM_TIMEOUT.
   const now = chainNow();
   const refundLikely =
     (phase === 1 && (d.playerCount < 2 || now > d.closesAt + 3600)) ||
@@ -573,13 +573,13 @@ function render() {
   $("refundBtn").disabled = !account || busy || !refundLikely;
 
   let hint = "";
-  if (phase === 0) hint = "Ronde masih menerima pendaftaran.";
-  else if (phase === 1 && d.playerCount >= 2) hint = "Ronde tutup. Tekan Draw untuk meminta angka acak (fee VRF dalam tBNB, kelebihan dikembalikan).";
-  else if (phase === 1) hint = "Pemain kurang dari 2 — ronde ini hanya bisa di-refund.";
-  else if (phase === 2 && !wordArrived) hint = "Draw terkirim. Menunggu Chainlink VRF… (biasanya < 1 menit). Refund baru bisa setelah 1 jam.";
-  else if (phase === 2 && wordArrived) hint = "Angka acak sudah keluar. Tekan Settle untuk membagi pot.";
-  else if (phase === 3) hint = "Ronde selesai. Payout sudah masuk ke saldo game masing-masing pemain.";
-  else if (phase === 4) hint = "Ronde di-refund penuh (tanpa burn/fee).";
+  if (phase === 0) hint = "Round is still accepting entries.";
+  else if (phase === 1 && d.playerCount >= 2) hint = "Round closed. Press Draw to request the random number (VRF fee in tBNB, overpayment refunded).";
+  else if (phase === 1) hint = "Fewer than 2 players — this round can only be refunded.";
+  else if (phase === 2 && !wordArrived) hint = "Draw sent. Waiting for Chainlink VRF… (usually < 1 minute). Refund only after 1 hour.";
+  else if (phase === 2 && wordArrived) hint = "Random number is out. Press Settle to split the pot.";
+  else if (phase === 3) hint = "Round settled. Payouts are in each player's game balance.";
+  else if (phase === 4) hint = "Round fully refunded (no burn/fee).";
   $("actionHint").textContent = hint;
 
   $("mintBtn").disabled = !account || busy;
@@ -608,7 +608,7 @@ function tickCountdown() {
   const now = chainNow();
   if (d.phase === 0 && viewRoundId === liveRoundId) {
     const s = Math.max(0, d.closesAt - now);
-    el.textContent = `Tutup dalam ${Math.floor(s / 60)}:${String(s % 60).padStart(2, "0")}`;
+    el.textContent = `Closes in ${Math.floor(s / 60)}:${String(s % 60).padStart(2, "0")}`;
   } else if (d.phase === 0) {
     el.textContent = "";
   } else {
@@ -625,17 +625,16 @@ async function renderResults(players) {
   const tbody = $("resultBody");
   tbody.innerHTML = "";
   if (d.phase === 4) {
-    $("summary").innerHTML = `Ronde di-refund. Pot <b>${fmtAGC(d.totalStaked)} AGC</b> dikembalikan penuh ke saldo game pemain (tanpa burn, tanpa fee).`;
+    $("summary").innerHTML = `Round refunded. Pot <b>${fmtAGC(d.totalStaked)} AGC</b> returned in full to players' game balances (no burn, no fee).`;
     $("animBtn").style.display = "none";
     return;
   }
-  // Settled: slot & payout dihitung LOKAL dari word on-chain + daftar
-  // pemain (audit MEDIUM-1: tanpa ini, tiap refresh menembak result()
-  // per pemain — 500 request untuk ronde penuh). Rumusnya identik dengan
-  // kontrak: payout = floor(pool × stake×mult / Σ stake×mult).
-  // Baris dibangun di fragment lalu dipasang sekali di akhir (dengan
-  // penjaga urutan) supaya panggilan renderResults yang tumpang tindih
-  // tidak menggandakan baris.
+  // Settled: slot & payout computed LOCALLY from the on-chain word + player
+  // list (audit MEDIUM-1: without this, every refresh fires result() per
+  // player — 500 requests for a full round). Formula identical to the
+  // contract: payout = floor(pool × stake×mult / Σ stake×mult).
+  // Rows are built in a fragment and attached once at the end (with a
+  // sequence guard) so overlapping renderResults calls never duplicate rows.
   const mySeq = ++renderResultsSeq;
   const ridSnap = viewRoundId, wordSnap = lastWord;
   const pool = d.totalStaked - d.burned - d.feePaid;
@@ -645,7 +644,7 @@ async function renderResults(players) {
   });
   const totalScore = scored.reduce((s, r) => s + r.score, 0n);
   const rows = scored.map(r => ({ ...r, payout: totalScore > 0n ? (pool * r.score) / totalScore : 0n }));
-  if (mySeq !== renderResultsSeq) return; // sudah ada panggilan yang lebih baru
+  if (mySeq !== renderResultsSeq) return; // a newer call already ran
   let sumPay = 0n;
   const frag = document.createDocumentFragment();
   for (const r of rows) {
@@ -654,7 +653,7 @@ async function renderResults(players) {
     const tr = document.createElement("tr");
     if (account && r.player.toLowerCase() === account.toLowerCase()) tr.className = "me";
     tr.innerHTML =
-      `<td title="${r.player}">${shortAddr(r.player)}${account && r.player.toLowerCase() === account.toLowerCase() ? " (kamu)" : ""}</td>` +
+      `<td title="${r.player}">${shortAddr(r.player)}${account && r.player.toLowerCase() === account.toLowerCase() ? " (you)" : ""}</td>` +
       `<td>${fmtAGC(r.stake)}</td><td>${r.slot}</td><td>${(multX100[r.slot] / 100).toFixed(1)}×</td>` +
       `<td title="${ethers.formatUnits(r.payout, 18)}">${fmtAGC(r.payout)}</td>` +
       `<td class="${net >= 0n ? "pos" : "neg"}">${fmtSigned(net)}</td>`;
@@ -664,16 +663,16 @@ async function renderResults(players) {
   tbody.appendChild(frag);
   $("summary").innerHTML =
     `Pot <b>${fmtAGC(d.totalStaked)}</b> AGC<br>` +
-    `Dibakar (0,3%) <b>${fmtAGC(d.burned)}</b> · Fee operasional (0,3%) <b>${fmtAGC(d.feePaid)}</b><br>` +
-    `Dibagikan <b>${fmtAGC(sumPay)}</b> · Debu pembulatan <b>${fmtAGC(d.dust)}</b><br>` +
-    `<span class="muted">Angka acak VRF: <span style="font-family:ui-monospace,monospace;font-size:11px">${lastWord.toString()}</span></span>`;
+    `Burned (0.3%) <b>${fmtAGC(d.burned)}</b> · Operational fee (0.3%) <b>${fmtAGC(d.feePaid)}</b><br>` +
+    `Paid out <b>${fmtAGC(sumPay)}</b> · Rounding dust <b>${fmtAGC(d.dust)}</b><br>` +
+    `<span class="muted">VRF random number: <span style="font-family:ui-monospace,monospace;font-size:11px">${lastWord.toString()}</span></span>`;
 
-  // Animasi bola hasil asli: diputar sekali per ronde setelah settle,
-  // untuk semua pemain (maks 8 bola; kalau lebih, bola sendiri saja).
-  // Bola TIDAK pernah jatuh sebelum hasil asli keluar. Snapshot
-  // {roundId, word} diteruskan eksplisit (audit LOW-5) supaya ganti ronde
-  // di tengah animasi tidak mencampur data; penanda "sudah diputar"
-  // dipasang di dalam playSettleAnimations setelah cek animating.
+  // Real-result ball animation: played once per round after settle, for all
+  // players (max 8 balls; if more, own ball only). Balls NEVER drop before
+  // the real result is out. The {roundId, word} snapshot is passed explicitly
+  // (audit LOW-5) so switching rounds mid-animation never mixes data; the
+  // "already played" marker is set inside playSettleAnimations after the
+  // animating check.
   const me = account && rows.find(r => r.player.toLowerCase() === account.toLowerCase());
   $("animBtn").style.display = me ? "inline-block" : "none";
   if (!animPlayedFor.has(ridSnap) && !animating) {
@@ -681,7 +680,7 @@ async function renderResults(players) {
   }
 }
 
-// Putar animasi bola semua pemain secara berurutan (jalur dari word on-chain).
+// Play all players' ball animations sequentially (paths from the on-chain word).
 async function playSettleAnimations(rows, players, me, roundId, word) {
   if (animating || rows.length === 0) return;
   animPlayedFor.add(roundId);
@@ -700,16 +699,16 @@ async function playSettleAnimations(rows, players, me, roundId, word) {
     await new Promise(res => setTimeout(res, 350));
   }
 }
-// --- Aksi (transaksi) ----------------------------------------------------------
+// --- Actions (transactions) ----------------------------------------------------------
 async function runTx(statusEl, label, fn) {
   if (busy) return;
   busy = true; render();
   try {
-    setStatus(statusEl, label + " — konfirmasi di wallet…");
+    setStatus(statusEl, label + " — confirm in your wallet…");
     const tx = await fn();
-    setStatus(statusEl, `${label} terkirim. Menunggu konfirmasi… <a href="${txLink(tx.hash)}" target="_blank" rel="noopener">lihat tx</a>`);
+    setStatus(statusEl, `${label} sent. Waiting for confirmation… <a href="${txLink(tx.hash)}" target="_blank" rel="noopener">view tx</a>`);
     await tx.wait();
-    setStatus(statusEl, `${label} berhasil. <a href="${txLink(tx.hash)}" target="_blank" rel="noopener">lihat tx</a>`, "ok");
+    setStatus(statusEl, `${label} successful. <a href="${txLink(tx.hash)}" target="_blank" rel="noopener">view tx</a>`, "ok");
   } catch (e) {
     setStatus(statusEl, friendlyError(e), "err");
   } finally {
@@ -718,7 +717,7 @@ async function runTx(statusEl, label, fn) {
   }
 }
 
-$("mintBtn").onclick = () => runTx($("enterStatus"), "Ambil AGC test",
+$("mintBtn").onclick = () => runTx($("enterStatus"), "Get test AGC",
   () => token.mint(account, MINT_AMOUNT));
 
 $("seedBtn").onclick = () => { $("seedInput").value = ethers.hexlify(ethers.randomBytes(32)); };
@@ -727,31 +726,31 @@ function readClientSeed() {
   const v = $("seedInput").value.trim();
   if (!v) return ethers.hexlify(ethers.randomBytes(32));
   if (/^0x[0-9a-fA-F]{64}$/.test(v)) return v;
-  return ethers.id(v); // teks bebas -> keccak256 -> bytes32
+  return ethers.id(v); // free text -> keccak256 -> bytes32
 }
 
 $("enterBtn").onclick = async () => {
   if (!account || busy) return;
   const amount = tiers[selectedTier];
   if (tokenBalance < amount) {
-    setStatus($("enterStatus"), "Saldo AGC test kurang. Klik “Ambil 100jt AGC test” dulu.", "err");
+    setStatus($("enterStatus"), "Not enough test AGC. Click “Get 100M test AGC” first.", "err");
     return;
   }
   busy = true; render();
   try {
     const allowance = await tokenRead.allowance(account, GAME_ADDR);
     if (allowance < amount) {
-      setStatus($("enterStatus"), "Approve token — konfirmasi di wallet…");
+      setStatus($("enterStatus"), "Approve token — confirm in your wallet…");
       const atx = await token.approve(GAME_ADDR, amount);
-      setStatus($("enterStatus"), `Approve terkirim… <a href="${txLink(atx.hash)}" target="_blank" rel="noopener">lihat tx</a>`);
+      setStatus($("enterStatus"), `Approve sent… <a href="${txLink(atx.hash)}" target="_blank" rel="noopener">view tx</a>`);
       await atx.wait();
     }
     const seed = readClientSeed();
-    setStatus($("enterStatus"), "Ikut ronde — konfirmasi di wallet…");
+    setStatus($("enterStatus"), "Joining round — confirm in your wallet…");
     const tx = await game.enter(viewRoundId, amount, seed);
-    setStatus($("enterStatus"), `Entri terkirim… <a href="${txLink(tx.hash)}" target="_blank" rel="noopener">lihat tx</a>`);
+    setStatus($("enterStatus"), `Entry sent… <a href="${txLink(tx.hash)}" target="_blank" rel="noopener">view tx</a>`);
     await tx.wait();
-    setStatus($("enterStatus"), `Berhasil ikut ronde #${viewRoundId} dengan ${fmtAGC(amount)} AGC. <a href="${txLink(tx.hash)}" target="_blank" rel="noopener">lihat tx</a>`, "ok");
+    setStatus($("enterStatus"), `Joined round #${viewRoundId} with ${fmtAGC(amount)} AGC. <a href="${txLink(tx.hash)}" target="_blank" rel="noopener">view tx</a>`, "ok");
   } catch (e) {
     setStatus($("enterStatus"), friendlyError(e), "err");
   } finally {
@@ -764,19 +763,19 @@ $("drawBtn").onclick = async () => {
   if (!account || busy) return;
   busy = true; render();
   try {
-    // Quote fee VRF pada gas price saat ini, kirim +50% buffer DAN
-    // gasPrice yang sama persis di tx (audit LOW-2: kontrak menghitung
-    // harga VRF dari tx.gasprice wallet; tanpa ini quote bisa meleset
-    // dan tx revert "insufficient VRF fee". Kelebihan dikembalikan.)
+    // Quote the VRF fee at the current gas price, send +50% buffer AND the
+    // exact same gasPrice in the tx (audit LOW-2: the contract prices VRF
+    // from the wallet's tx.gasprice; without this the quote can miss and the
+    // tx reverts "insufficient VRF fee". Overpayment is refunded.)
     const feeData = await readProvider.getFeeData();
     const gasPrice = feeData.gasPrice ?? ethers.parseUnits("1", "gwei");
     const fee = await gameRead.drawFee(gasPrice);
     const value = (fee * 150n) / 100n;
-    setStatus($("actionStatus"), `Draw — fee VRF ≈ ${ethers.formatEther(fee)} tBNB. Konfirmasi di wallet…`);
+    setStatus($("actionStatus"), `Draw — VRF fee ≈ ${ethers.formatEther(fee)} tBNB. Confirm in your wallet…`);
     const tx = await game.draw(viewRoundId, { value, gasPrice });
-    setStatus($("actionStatus"), `Draw terkirim… <a href="${txLink(tx.hash)}" target="_blank" rel="noopener">lihat tx</a>`);
+    setStatus($("actionStatus"), `Draw sent… <a href="${txLink(tx.hash)}" target="_blank" rel="noopener">view tx</a>`);
     await tx.wait();
-    setStatus($("actionStatus"), `Draw berhasil. Menunggu angka acak dari Chainlink VRF… <a href="${txLink(tx.hash)}" target="_blank" rel="noopener">lihat tx</a>`, "ok");
+    setStatus($("actionStatus"), `Draw successful. Waiting for the random number from Chainlink VRF… <a href="${txLink(tx.hash)}" target="_blank" rel="noopener">view tx</a>`, "ok");
   } catch (e) {
     setStatus($("actionStatus"), friendlyError(e), "err");
   } finally {
@@ -789,7 +788,7 @@ $("settleBtn").onclick = () => runTx($("actionStatus"), "Settle", () => game.set
 $("refundBtn").onclick = () => runTx($("actionStatus"), "Refund", () => game.refund(viewRoundId));
 $("withdrawBtn").onclick = () => runTx($("withdrawStatus"), "Withdraw", () => game.withdraw(gameBalance));
 
-// --- Navigasi ronde --------------------------------------------------------------
+// --- Round navigation --------------------------------------------------------------
 function goRound(id) {
   if (id < 0) id = 0;
   viewRoundId = id;
@@ -801,7 +800,7 @@ $("nextRoundBtn").onclick = () => goRound(viewRoundId + 1);
 $("liveRoundBtn").onclick = () => { followLive = true; viewRoundId = liveRoundId; refreshAll(); };
 $("roundInput").onchange = e => goRound(parseInt(e.target.value || "0", 10));
 
-// --- Papan Plinko + animasi --------------------------------------------------------
+// --- Plinko board + animation --------------------------------------------------------
 const ROWS = 8, SLOTS = 9;
 const cv = $("board"), ctx = cv.getContext("2d");
 const W = cv.width, H = cv.height;
@@ -839,9 +838,9 @@ function drawBoard(ball) {
 }
 drawBoard(null);
 
-// Bit jalur bola persis seperti kontrak: byte teratas dari
+// Ball path bits exactly like the contract: top byte of
 // keccak256(abi.encode(word, roundId, player, clientSeed)).
-// Popcount-nya = slot; urutan bit (MSB dulu) hanya untuk animasi.
+// Its popcount = slot; bit order (MSB first) is only for animation.
 function myPathBits(roundId, player, clientSeed, word = lastWord) {
   const enc = ethers.AbiCoder.defaultAbiCoder().encode(
     ["uint256", "uint256", "address", "bytes32"], [word, roundId, player, clientSeed]);
@@ -851,16 +850,16 @@ function myPathBits(roundId, player, clientSeed, word = lastWord) {
   return bits;
 }
 
-// Slot seorang pemain dari word on-chain (identik dengan _slotOf kontrak):
-// popcount 8-bit teratas dari keccak256(abi.encode(word, roundId, player, seed)).
+// A player's slot from the on-chain word (identical to the contract's _slotOf):
+// popcount of the top 8 bits of keccak256(abi.encode(word, roundId, player, seed)).
 function slotOf(word, roundId, player, clientSeed) {
   return myPathBits(roundId, player, clientSeed, word).reduce((s, b) => s + b, 0);
 }
 
 let animating = false;
 
-// Animasi inti: jatuhkan bola mengikuti urutan bit (kiri/kanan per baris).
-// Mengembalikan Promise yang selesai saat bola mendarat.
+// Core animation: drop the ball following the bit order (left/right per row).
+// Returns a Promise that resolves when the ball lands.
 function animateBits(bits) {
   return new Promise(resolve => {
     if (animating) { resolve(); return; }
@@ -902,7 +901,7 @@ async function playBallAnimation(expectedSlot) {
   const en = await gameRead.entryOf(viewRoundId, account);
   if (en.stake === 0n) return;
   const bits = myPathBits(viewRoundId, account, en.clientSeed);
-  // slot harus sama dengan result() on-chain; animasi hanya visual.
+  // slot must match on-chain result(); animation is visual only.
   cv.scrollIntoView({ behavior: "smooth", block: "center" });
   animateBits(bits);
 }
